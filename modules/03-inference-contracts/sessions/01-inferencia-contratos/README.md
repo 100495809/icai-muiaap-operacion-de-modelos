@@ -9,6 +9,8 @@ microprácticas y demo sin programar la solución que se construirá en la clase
 
 [Abrir diapositivas de la sesión](slides/Semana_03_Clase_1_Inferencia_y_Contratos.pptx)
 
+[Abrir notebook docente](notebooks/01-inferencia-y-contratos-guiada.ipynb)
+
 El profesor entrega un clasificador de calidad de vino ya entrenado y cinco
 muestras sin etiqueta. La primera hora es teoría participativa —cada concepto
 incluye una microdecisión de las parejas—; la segunda es una demo local de 60

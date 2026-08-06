@@ -4,6 +4,10 @@
 de CSV hasta una predicción y ha decidido el contrato que implementará en la
 clase 2. No se programa código de producción en esta sesión.
 
+El docente puede ejecutar el [notebook guiado](../sessions/01-inferencia-contratos/notebooks/01-inferencia-y-contratos-guiada.ipynb)
+como hilo conductor de la demo. Las celdas marcadas como “Práctica” se pausan
+para que las parejas respondan antes de revelar el resultado.
+
 ## Preparación del docente
 
 - Compartir el CSV de muestra y el árbol del *starter*, pero no la carpeta
