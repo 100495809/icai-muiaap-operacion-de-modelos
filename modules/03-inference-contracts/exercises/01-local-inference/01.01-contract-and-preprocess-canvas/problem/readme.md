@@ -11,3 +11,7 @@ hoja compartida, entregad:
 
 No escribáis código todavía. El resultado será la especificación que usaréis en
 el taller.
+
+También podéis trabajar en el
+[`notebook de alumnado`](01-inferencia-y-contratos-alumno.ipynb), que deja las
+implementaciones como `TODO` y no contiene la solución docente.

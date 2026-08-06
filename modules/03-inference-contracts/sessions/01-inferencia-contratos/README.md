@@ -11,6 +11,9 @@ microprácticas y demo sin programar la solución que se construirá en la clase
 
 [Abrir notebook docente](notebooks/01-inferencia-y-contratos-guiada.ipynb)
 
+La versión para el alumnado está en la [práctica 01.01](../../exercises/01-local-inference/01.01-contract-and-preprocess-canvas/problem/01-inferencia-y-contratos-alumno.ipynb)
+y contiene solo guías, preguntas y celdas `TODO`.
+
 El profesor entrega un clasificador de calidad de vino ya entrenado y cinco
 muestras sin etiqueta. La primera hora es teoría participativa —cada concepto
 incluye una microdecisión de las parejas—; la segunda es una demo local de 60
