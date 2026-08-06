@@ -1,7 +1,10 @@
 # Ejemplo ejecutable — Módulo local de inferencia
 
-El código ejecutable está en `src/model_inference/`. Carga un clasificador de
-calidad de vino ya entrenado y procesa un CSV de muestras nuevas con `uv`.
+La referencia ejecutable está en
+`../../solutions/01.02-wine-quality-inference-module/src/model_inference/`.
+Carga un clasificador de calidad de vino ya entrenado y procesa un CSV de
+muestras nuevas con `uv`. El alumnado trabaja, en cambio, con el *starter* de
+la práctica 01.02.
 
 ## Mapa del módulo
 
@@ -14,8 +17,8 @@ calidad de vino ya entrenado y procesa un CSV de muestras nuevas con `uv`.
 
 ## Ejecución
 
-El artefacto entregado por el profesorado debe estar en
-`models/wine_quality_classifier.joblib`; está excluido de Git.
+Desde la raíz del repositorio, el artefacto entregado por el profesorado debe
+estar en `models/wine_quality_classifier.joblib`; está excluido de Git.
 
 ```bash
 uv sync
@@ -27,5 +30,5 @@ uv run python -m model_inference.predict_file \
 Antes de cambiar el código, ejecuta el contrato automatizado:
 
 ```bash
-uv run pytest tests/test_inference_cli.py
+uv run pytest
 ```

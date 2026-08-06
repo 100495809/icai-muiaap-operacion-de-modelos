@@ -6,8 +6,21 @@ from pathlib import Path
 import joblib
 from sklearn.dummy import DummyClassifier
 
-from model_inference.inference import artifact_payload
-from model_inference.preprocess import FEATURE_NAMES
+# La expectativa no procede de la implementación: la prueba protege el contrato
+# frente a cambios accidentales en el orden de características.
+EXPECTED_FEATURE_NAMES = (
+    "fixed_acidity",
+    "volatile_acidity",
+    "citric_acid",
+    "residual_sugar",
+    "chlorides",
+    "free_sulfur_dioxide",
+    "total_sulfur_dioxide",
+    "density",
+    "ph",
+    "sulphates",
+    "alcohol",
+)
 
 WINE_SAMPLE = {
     "fixed_acidity": "7.4",
@@ -28,8 +41,15 @@ def write_instructor_model(model_path: Path) -> None:
     """Crea un artefacto estable para probar el comando público de inferencia."""
 
     estimator = DummyClassifier(strategy="constant", constant="acceptable")
-    estimator.fit([[0.0] * len(FEATURE_NAMES)], ["acceptable"])
-    joblib.dump(artifact_payload(estimator, "wine-quality-rf-v1"), model_path)
+    estimator.fit([[0.0] * len(EXPECTED_FEATURE_NAMES)], ["acceptable"])
+    joblib.dump(
+        {
+            "estimator": estimator,
+            "feature_names": list(EXPECTED_FEATURE_NAMES),
+            "model_version": "wine-quality-rf-v1",
+        },
+        model_path,
+    )
 
 
 def write_input_csv(
@@ -142,4 +162,27 @@ def test_predict_file_rejects_an_empty_sample_id(tmp_path: Path) -> None:
 
     assert completed.returncode == 2
     assert "sample_id" in completed.stderr
+    assert not output_path.exists()
+
+
+def test_predict_file_rejects_an_incompatible_model_artifact(tmp_path: Path) -> None:
+    model_path = tmp_path / "incompatible_wine_model.joblib"
+    input_path = tmp_path / "inference_samples.csv"
+    output_path = tmp_path / "predictions.csv"
+    estimator = DummyClassifier(strategy="constant", constant="acceptable")
+    estimator.fit([[0.0] * len(EXPECTED_FEATURE_NAMES)], ["acceptable"])
+    joblib.dump(
+        {
+            "estimator": estimator,
+            "feature_names": list(reversed(EXPECTED_FEATURE_NAMES)),
+            "model_version": "wine-quality-rf-v1",
+        },
+        model_path,
+    )
+    write_input_csv(input_path)
+
+    completed = run_predict_file(model_path, input_path, output_path)
+
+    assert completed.returncode == 2
+    assert "feature_names" in completed.stderr
     assert not output_path.exists()

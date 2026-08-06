@@ -46,7 +46,7 @@ def load_wine_quality_model(model_path: Path) -> LoadedWineModel:
     artifact_features = tuple(payload.get("feature_names", []))
     if artifact_features != FEATURE_NAMES:
         raise ValueError(
-            "Las características del artefacto no coinciden con el contrato."
+            "Los feature_names del artefacto no coinciden con el contrato."
         )
 
     estimator = payload.get("estimator")

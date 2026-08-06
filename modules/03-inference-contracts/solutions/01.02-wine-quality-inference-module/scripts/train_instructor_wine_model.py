@@ -7,11 +7,10 @@ import csv
 from pathlib import Path
 
 import joblib
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-
 from model_inference.inference import artifact_payload
 from model_inference.preprocess import FEATURE_NAMES
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 MODEL_VERSION = "wine-quality-rf-v1"
 

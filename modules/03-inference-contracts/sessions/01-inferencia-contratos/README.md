@@ -4,12 +4,28 @@ Resultado de aprendizaje: diferenciar entrenamiento, artefacto e inferencia;
 definir contratos de entrada y salida, y detectar transformaciones que deben ser
 idénticas a las usadas al entrenar.
 
+El [guion docente](../../guides/class-1-practices.md) intercala explicación,
+microprácticas y demo sin programar la solución que se construirá en la clase 2.
+
 [Abrir diapositivas de la sesión](slides/Semana_03_Clase_1_Inferencia_y_Contratos.pptx)
 
 El profesor entrega un clasificador de calidad de vino ya entrenado y cinco
 muestras sin etiqueta. La primera hora es teoría participativa —cada concepto
 incluye una microdecisión de las parejas—; la segunda es una demo local de 60
 minutos. No se entrena el modelo ni se implementa una capa web.
+
+Secuencia: concepto breve y micropráctica; construcción acompañada del mapa de
+inferencia durante la demo; extensión autónoma del lienzo con un caso inválido;
+y debrief de los criterios de aceptación que guiarán el taller.
+
+## Preparación de la demo
+
+Antes de clase, el docente ejecuta `uv sync` desde la raíz del repositorio y
+copia el modelo preentrenado del paquete docente a
+`models/wine_quality_classifier.joblib` (el artefacto está excluido de Git).
+Debe ejecutar una vez el comando de la sección 6 y comprobar que se escriben
+cinco predicciones. El mismo archivo se distribuirá con el *starter* en la
+clase 2.
 
 ## Primera hora — Teoría participativa
 
