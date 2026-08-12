@@ -45,3 +45,19 @@ semana1/data/raw/heart.csv
 No se necesitan credenciales, endpoints de pago ni datos reales de pacientes.
 El resultado es exclusivamente didáctico y no debe utilizarse para diagnóstico
 ni para tomar decisiones sobre pacientes.
+
+## Cómo comprobar la semana
+
+La semana 1 no tiene una suite `pytest` local: sus prácticas son notebooks
+pensados para Databricks Free Edition. Desde la raíz de esta semana se pueden
+validar la estructura, el dataset y el formato JSON de todas las libretas:
+
+```bash
+cd semana1
+test -f data/raw/heart.csv
+find modules -name '*.ipynb' -print0 | xargs -0 -n1 jq empty
+```
+
+Para comprobar el comportamiento didáctico, abre la carpeta `semana1/` como
+Git Folder en Databricks y ejecuta las versiones `_solucion.ipynb`. Después
+ejecuta las versiones sin resolver para que el alumnado complete sus `TODO`.

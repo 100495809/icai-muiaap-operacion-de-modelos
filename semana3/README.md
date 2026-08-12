@@ -35,11 +35,36 @@ casos válidos y los errores sin dejar salidas parciales.
 - [Guion del taller de la clase 2](modules/03-inference-contracts/guides/class-2-workshop.md): módulo local, CLI y tests.
 - [Proyecto starter](modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/): implementación del alumnado.
 
-## Desarrollo
+## Tests y validación
+
+Desde la raíz de esta semana, instala las dependencias y ejecuta toda la suite
+automatizada de la solución docente:
 
 ```bash
+cd semana3
 uv sync
 uv run pytest
 uv run ruff check modules/03-inference-contracts/solutions
 uv run ruff format --check modules/03-inference-contracts/solutions
+```
+
+La suite docente debe terminar con todos los tests en verde. Para ejecutar
+también los tests que recibe el alumnado:
+
+```bash
+uv run pytest \
+  modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/tests
+```
+
+Estos últimos están diseñados para fallar mientras el `starter` conserve sus
+`TODO`; deben pasar cuando se complete la implementación de la clase 2. Para
+comprobar además su estilo y formato:
+
+```bash
+uv run ruff check \
+  modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/src \
+  modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/tests
+uv run ruff format --check \
+  modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/src \
+  modules/03-inference-contracts/exercises/01-local-inference/01.02-wine-quality-inference-module/problem/starter/tests
 ```
