@@ -1,0 +1,75 @@
+# Copia esta plantilla en tu entrega. No incluyas datos personales, tokens,
+# nombres de pacientes ni contenido sensible de prompts.
+project:
+  name: "clasificacion_riesgo_cardiovascular_didactica"
+  team_alias: "pareja-07"
+  decision_supported: "seleccionar con validación y comprobar una vez en test"
+  users_affected: "personal clínico; decisión siempre supervisada"
+data:
+  source: "data/raw/heart.csv (caso existente del repositorio)"
+  contains_personal_data: false
+  limitations:
+    - "Dataset didáctico; no representa una población clínica real."
+    - "No puede utilizarse para diagnóstico ni para tomar decisiones clínicas."
+evidence:
+  mlflow_experiment: "experimento asociado al notebook de Free Edition"
+  batch_id: "xxxxxxxx"
+  candidate_runs: 6
+  selection_gate:
+    minimum_validation_recall: 0.72
+    ranking:
+      - "validation.f1 DESC"
+      - "validation.roc_auc DESC"
+      - "validation.latency_ms_per_row ASC"
+    test_used_for_selection: false
+  winner:
+    run_id: "TODO"
+    validation_f1: null
+    validation_recall: null
+    test_f1: null
+    test_recall: null
+registry:
+  registered_model: "catalog.schema.heart_classifier_pareja_07"
+  rollback_version: null
+  champion_version: null
+  challenger_smoke_test_passed: true
+  rollback_verified: true
+  alias: "Champion"
+  signature_present: true
+deployment:
+  mode: "local_notebook_http"
+  source_artifact: "deployment/model.pkl"
+  public_endpoint: false
+  persistent: false
+  deployment_run_id: "TODO"
+  contract_tests:
+    health_status: 200
+    valid_prediction_status: 200
+    invalid_request_status: 400
+    non_object_json_status: 400
+  api_stopped: true
+risks:
+  - id: R1
+    risk: "Uso clínico fuera del contexto docente"
+    impact: high
+    likelihood: medium
+    owner: "equipo de producto"
+    mitigation: "Aviso explícito, supervisión humana y prohibición de uso clínico."
+  - id: R2
+    risk: "Un secreto aparece en un parámetro, tag, artefacto o traza"
+    impact: high
+    likelihood: low
+    owner: "responsable técnico"
+    mitigation: "Usar identidad del entorno o Secrets; revisar logs antes de compartir."
+  - id: R3
+    risk: "Training y serving aplican transformaciones diferentes"
+    impact: high
+    likelihood: medium
+    owner: "ml_engineer"
+    mitigation: "Empaquetar preprocessing y modelo en el mismo Pipeline y probar el contrato."
+  - id: R4
+    risk: "Una respuesta de agente no está respaldada por el contexto"
+    impact: medium
+    likelihood: medium
+    owner: "responsable de IA"
+    mitigation: "Trazas, conjunto de evaluación y revisión humana."
