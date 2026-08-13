@@ -1,15 +1,15 @@
 # Semana 01 — De un notebook a una operación observable
 
 Este módulo está integrado en `semana1/` del repositorio ICAI MUIAAp. Abre la
-carpeta `semana1/` como Git Folder para que los notebooks encuentren el dataset
-en `data/raw/heart.csv`.
+carpeta `semana1/` como Git Folder para que el notebook de tracking encuentre
+el dataset didáctico en `data/raw/WineQT.csv`.
 
 ## Resultado de aprendizaje
 
 Al terminar la semana, el alumnado distingue un prototipo de un sistema
 operable y recorre en Databricks el ciclo de MLflow: tracking de datos,
 parámetros, métricas, artefactos y modelos; elección mediante un gate; test
-reservado; Registry con alias; y despliegue local del pickle ganador mediante
+reservado; Registry con alias; y despliegue local del `model.joblib` ganador mediante
 una API observable. Además registra una traza de agente y una evaluación mínima
 de una aplicación con LLM.
 
@@ -33,9 +33,10 @@ y [Sesión 02](sessions/02-mlflow-free-edition/README.md).
 
 El docente ejecuta las celdas esenciales de
 [`notebooks/01_tracking_mlops_solucion.ipynb`](notebooks/01_tracking_mlops_solucion.ipynb): usa el
-experimento del notebook, crea seis candidatos reproducibles y muestra cómo los
+experimento del notebook, crea siete candidatos reproducibles —seis ExtraTrees y
+uno XGBoost— y muestra cómo los
 inputs, firma, artefactos y métricas permiten comparar. Después aplica el gate,
-registra `Champion` y prueba una API HTTP local que carga el pickle ganador.
+registra `Champion` y prueba una API HTTP local que carga el `model.joblib` ganador.
 
 ### 3. Extensión independiente — Clase 2, segunda hora (60 min)
 

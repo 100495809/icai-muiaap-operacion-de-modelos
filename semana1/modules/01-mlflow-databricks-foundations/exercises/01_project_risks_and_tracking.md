@@ -5,7 +5,7 @@
 ## Objetivo
 
 Transformar un entrenamiento en un ciclo observable: candidatos comparables,
-selección sin contaminar test, versión registrada, API local del pickle ganador
+selección sin contaminar test, versión registrada, API local del `model.joblib` ganador
 y evidencia operativa. Completar después una traza y evaluación de agente.
 
 ## Antes de empezar
@@ -21,10 +21,10 @@ y evidencia operativa. Completar después una traza y evaluación de agente.
 ## Parte A — Ciclo de ML con MLflow (150–210 min)
 
 1. Completa `notebooks/01_tracking_mlops.ipynb` siguiendo su guía específica.
-2. Genera seis candidatos con evidencia completa y el mismo split.
+2. Genera siete candidatos con evidencia completa y el mismo split.
 3. Aplica el gate sobre validación y abre test sólo para el ganador.
 4. Registra el ganador, asigna `Champion` y verifica carga por alias.
-5. Sirve el pickle en localhost, prueba éxito/error, registra señales y apágalo.
+5. Sirve el `model.joblib` en localhost, prueba éxito/error, registra señales y apágalo.
 6. Adapta `examples/s01_project_record.yaml` y regístralo como artefacto.
 
 ## Parte B — AgentOps y LLMOps (30–45 min)
@@ -55,7 +55,7 @@ Entrega una ficha corta (Markdown, YAML o enlace a su artefacto de MLflow) con:
 
 | Criterio | Puntos |
 | --- | ---: |
-| Seis runs comparables con inputs, parámetros, métricas y artefactos | 2 |
+| Siete runs comparables con inputs, parámetros, métricas y artefactos | 2 |
 | Gate reproducible y test reservado únicamente al ganador | 2 |
 | Registry con firma, versión, tags y alias `Champion` | 2 |
 | API local: pickle, contrato, pruebas, observabilidad y apagado | 2 |

@@ -1,35 +1,35 @@
 # Copia esta plantilla en tu entrega. No incluyas datos personales, tokens,
 # nombres de pacientes ni contenido sensible de prompts.
 project:
-  name: "clasificacion_riesgo_cardiovascular_didactica"
+  name: "clasificacion_wine_quality_didactica"
   team_alias: "pareja-07"
   decision_supported: "seleccionar con validación y comprobar una vez en test"
-  users_affected: "personal clínico; decisión siempre supervisada"
+  users_affected: "equipo docente; ninguna decisión comercial"
 data:
-  source: "data/raw/heart.csv (caso existente del repositorio)"
+  source: "data/raw/WineQT.csv (caso didáctico del repositorio)"
   contains_personal_data: false
   limitations:
-    - "Dataset didáctico; no representa una población clínica real."
-    - "No puede utilizarse para diagnóstico ni para tomar decisiones clínicas."
+    - "quality_high vale 1 cuando quality >= 6; el umbral es una decisión didáctica."
+    - "No representa una población vinícola completa ni autoriza decisiones comerciales."
 evidence:
   mlflow_experiment: "experimento asociado al notebook de Free Edition"
   batch_id: "xxxxxxxx"
-  candidate_runs: 6
+  candidate_runs: 7
   selection_gate:
-    minimum_validation_recall: 0.72
+    minimum_validation_f1_macro: 0.70
     ranking:
-      - "validation.f1 DESC"
-      - "validation.roc_auc DESC"
+      - "validation.f1_macro DESC"
+      - "validation.accuracy DESC"
       - "validation.latency_ms_per_row ASC"
     test_used_for_selection: false
   winner:
     run_id: "TODO"
-    validation_f1: null
-    validation_recall: null
-    test_f1: null
-    test_recall: null
+    validation_f1_macro: null
+    validation_recall_macro: null
+    test_f1_macro: null
+    test_recall_macro: null
 registry:
-  registered_model: "catalog.schema.heart_classifier_pareja_07"
+  registered_model: "catalog.schema.wine_quality_classifier_pareja_07"
   rollback_version: null
   champion_version: null
   challenger_smoke_test_passed: true
@@ -38,7 +38,7 @@ registry:
   signature_present: true
 deployment:
   mode: "local_notebook_http"
-  source_artifact: "deployment/model.pkl"
+  source_artifact: "deployment/model.joblib"
   public_endpoint: false
   persistent: false
   deployment_run_id: "TODO"
@@ -50,11 +50,11 @@ deployment:
   api_stopped: true
 risks:
   - id: R1
-    risk: "Uso clínico fuera del contexto docente"
+    risk: "Uso de quality_high como garantía de calidad comercial"
     impact: high
     likelihood: medium
     owner: "equipo de producto"
-    mitigation: "Aviso explícito, supervisión humana y prohibición de uso clínico."
+    mitigation: "Aviso explícito, validación de laboratorio y prohibición de uso comercial."
   - id: R2
     risk: "Un secreto aparece en un parámetro, tag, artefacto o traza"
     impact: high

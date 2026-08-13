@@ -6,7 +6,7 @@ observable con MLflow y Databricks Free Edition.
 El material completo está en
 [`modules/01-mlflow-databricks-foundations/`](modules/01-mlflow-databricks-foundations/).
 Incluye dos clases, dos prácticas de notebook, una ficha de proyecto, una guía
-docente y el dataset didáctico en `data/raw/heart.csv`.
+docente y los datasets didácticos de `data/raw/`.
 
 ## Clase 1 — Del prototipo a la operación y puesta a punto
 
@@ -43,7 +43,7 @@ Las prácticas están diseñadas para abrirse como Git Folder en Databricks Free
 Edition. El notebook de ciclo de vida usa el dataset relativo a esta semana:
 
 ```text
-semana1/data/raw/heart.csv
+semana1/data/raw/WineQT.csv
 ```
 
 No se necesitan credenciales, endpoints de pago ni datos reales de pacientes.
@@ -58,7 +58,7 @@ validar la estructura, el dataset y el formato JSON de todas las libretas:
 
 ```bash
 cd semana1
-test -f data/raw/heart.csv
+test -f data/raw/WineQT.csv
 find modules -name '*.ipynb' -print0 | xargs -0 -n1 jq empty
 ```
 

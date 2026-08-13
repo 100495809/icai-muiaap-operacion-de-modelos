@@ -8,7 +8,7 @@ experimento compartido ni un endpoint de pago. MLflow guarda
 los *runs*, trazas y evaluaciones en el experimento asociado a cada notebook.
 
 El recorrido de ML incluye tracking, selección, test reservado, Model Registry
-en Unity Catalog y una API local efímera que carga el pickle ganador. La API
+en Unity Catalog y una API local efímera que carga el `model.joblib` ganador. La API
 sólo escucha en el driver y no consume Model Serving. Registry puede requerir
 un catálogo/esquema personal con permiso `CREATE MODEL`.
 
@@ -18,7 +18,7 @@ un catálogo/esquema personal con permiso `CREATE MODEL`.
    accedan a su workspace antes de la sesión. Free Edition es un entorno
    serverless con cuota; deja un margen para que se active el compute.
 2. Comparte este repositorio. Cada estudiante puede importarlo como Databricks
-   Git Folder. Así los notebooks encuentran el caso existente `data/raw/WINEQT.csv`.
+   Git Folder. Así los notebooks encuentran el caso existente `data/raw/WineQT.csv`.
    Si se suben manualmente, sube también el CSV y actualiza `DATASET_PATH`.
 3. Entrega los notebooks sin resolver y conserva los pares `_solucion.ipynb`
    para la demostración y la corrección. Prueba las soluciones desde una cuenta

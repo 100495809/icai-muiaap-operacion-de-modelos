@@ -2,18 +2,36 @@
 
 ## Qué vas a conseguir
 
-Llevarás el caso de clasificación cardiovascular que ya existe en el
-repositorio por un ciclo de vida completo:
+Llevarás el dataset didáctico Wine Quality (`data/raw/WineQT.csv`) por un ciclo
+de vida completo:
 
-`datos → seis candidatos → comparación → gate → test → Registry → API → métricas de servicio`
+`datos → siete candidatos → comparación → gate → test → Registry → API → métricas de servicio`
 
 Cada candidato contendrá inputs de datos, parámetros, métricas de validación,
 matriz de confusión, reporte por clase, gobierno, modelo MLflow con firma y un
-`model.pkl`. Después registrarás únicamente el ganador, le asignarás el alias
-`Champion` y servirás su pickle mediante una API HTTP local.
+`model.joblib`. La etiqueta de trabajo será `quality_high`: vale 1 si
+`quality >= 6` y 0 en otro caso. Compararás candidatos `ExtraTreesClassifier` y
+`XGBClassifier` bajo el mismo contrato. Después registrarás únicamente el ganador, le asignarás el alias
+`Champion` y servirás su `model.joblib` mediante una API HTTP local.
 
-El resultado es evidencia didáctica: no es un sistema clínico ni autoriza
-decisiones sobre pacientes.
+El resultado es evidencia didáctica: el umbral no es una norma comercial ni
+autoriza decisiones sobre la calidad de un producto real.
+
+## Smoke test local sin MLflow
+
+Desde la raíz del repositorio puedes comprobar el entrenamiento sin credenciales
+ni Databricks. El arnés usa el mismo split, incluye el candidato XGBoost y sólo
+abre test después de elegir por validación:
+
+```bash
+uv run --no-project \
+  --with pandas==2.2.3 \
+  --with scikit-learn==1.9.0 \
+  --with xgboost==3.0.5 \
+  tools/local_wine_training.py
+```
+
+En macOS puede ser necesario disponer del runtime OpenMP que requiere XGBoost.
 
 ## Duración y organización
 
@@ -30,7 +48,7 @@ reinicias desde el principio se generará otro lote.
 1. Entra en tu workspace personal de Databricks Free Edition y espera al
    compute serverless.
 2. Abre la carpeta `semana1/` como Databricks Git Folder para conservar la ruta
-   a `data/raw/heart.csv`.
+   a `data/raw/WineQT.csv`.
 3. Abre `notebooks/01_tracking_mlops.ipynb`, la versión sin resolver. Consulta
    la solución sólo después de entregar tu intento.
 4. Si subiste la libreta manualmente, sube también el CSV y cambia
@@ -44,10 +62,13 @@ reinicias desde el principio se generará otro lote.
    porque el pipeline los imputa; una columna obligatoria ausente no.
 4. Divide de forma estratificada: 60 % train, 20 % validación y 20 % test.
    **No leas test** antes de elegir el ganador.
-5. Construye un `Pipeline` que incluya imputación, codificación y
-   `RandomForestClassifier`. El mismo objeto debe llegar al serving.
-6. Define al menos seis configuraciones. Mantén constantes el dataset, split,
-   métricas y semilla para que la comparación tenga sentido.
+5. Construye un `Pipeline` que incluya imputación y el estimador de cada
+   candidato (`ExtraTreesClassifier` o `XGBClassifier`). El mismo objeto debe
+   llegar al serving.
+6. Define al menos siete configuraciones, incluyendo la configuración
+   `ExtraTrees(300, max_depth=None, min_samples_leaf=1, max_features=1.0)` y al
+   menos un XGBoost. Mantén constantes el dataset, split, métricas y semilla
+   para que la comparación tenga sentido.
 
 ## Fase 2 — Tracking y artefactos
 
@@ -56,11 +77,11 @@ Para cada candidato comprueba que el run incluye:
 - tags `student.alias`, `batch.id`, `lifecycle.phase`, `use_case` y riesgo;
 - hiperparámetros, semillas, tamaños de split y versiones de librerías;
 - inputs de train/validación mediante `mlflow.log_input()`;
-- accuracy, precision, recall, F1, ROC AUC, tiempo de fit, latencia por fila y
-  tamaño del pickle;
+- accuracy, precision, recall, F1 macro, tiempo de fit, latencia por fila y
+  tamaño de `model.joblib`;
 - tarjeta de datos, calidad, riesgos, reporte por clase y matriz de confusión;
 - modelo MLflow con firma e `input_example`;
-- `deployment/model.pkl` y `deployment/inference_contract.json`.
+- `deployment/model.joblib` y `deployment/inference_contract.json`.
 
 El registro es manual para entender qué evidencia es responsabilidad del
 equipo. En sesiones posteriores podrás compararlo con `autolog`.
@@ -68,8 +89,9 @@ equipo. En sesiones posteriores podrás compararlo con `autolog`.
 ## Fase 3 — Elección y test
 
 1. Recupera sólo runs de tu alias, lote y fase con `mlflow.search_runs()`.
-2. Aplica la regla acordada antes de ver resultados: recall de validación ≥
-   0,72; después F1 descendente, ROC AUC descendente y latencia ascendente.
+2. Aplica la regla acordada antes de ver resultados: `validation.f1_macro >=
+   0,70`; después F1 macro descendente, accuracy descendente y latencia
+   ascendente.
 3. Si nadie supera el gate, detente. Rebajar el umbral después de observar los
    resultados convierte el gate en decoración.
 4. Guarda el `model_info.model_uri` de cada candidato como tag, carga el ganador
@@ -79,7 +101,7 @@ equipo. En sesiones posteriores podrás compararlo con `autolog`.
 ## Fase 4 — Registry
 
 1. Configura `databricks-uc` y descubre catálogo/esquema activos con Spark.
-2. Registra el modelo con nombre `<catalog>.<schema>.heart_classifier_<alias>`.
+2. Registra el modelo con nombre `<catalog>.<schema>.wine_quality_classifier_<alias>`.
 3. Registra una referencia de rollback y el ganador como segunda versión;
    añade descripciones y tags de uso/validación.
 4. Asigna `Challenger` al ganador, haz un smoke test, promociónalo a
@@ -93,7 +115,7 @@ activos y que puedes crear modelos. En un workspace personal suele ser
 
 ## Fase 5 — API local y observabilidad
 
-1. Resuelve el run de `Champion` y descarga `deployment/model.pkl` con MLflow.
+1. Resuelve el run de `Champion` y descarga `deployment/model.joblib` con MLflow.
 2. Levanta `ThreadingHTTPServer` en `127.0.0.1` y puerto automático. Expón
    `GET /health` y `POST /predict`.
 3. El contrato es `{"instances": [{...}]}` con todas y sólo las features
@@ -112,7 +134,7 @@ límite entre artefacto y servicio, no un endpoint de producción.
 
 En **Experiments** y **Catalog Explorer** debes ver:
 
-- al menos seis candidatos en el mismo lote;
+- al menos siete candidatos en el mismo lote;
 - test únicamente en el ganador;
 - dos versiones, `Challenger`, promoción, rollback y `Champion` final;
 - un run de despliegue con una petición rechazada de forma controlada;
