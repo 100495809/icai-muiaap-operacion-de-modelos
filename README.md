@@ -39,6 +39,27 @@ materiales se incorporarán manteniendo este mismo recorrido. Las semanas con
 material ya disponible tienen su guía específica en el `README.md` de cada
 carpeta.
 
+## Handouts PDF de assignments
+
+Las prácticas de las semanas con material desarrollado también están disponibles
+como handouts independientes, separados por clase. Siguen una estructura de
+assignment académico: objetivo, punto de partida, tareas, evidencias,
+criterios de aceptación, rúbrica y comandos de comprobación. El formato toma
+como referencia la organización de [CS336 Assignment 1 de Stanford](https://github.com/stanford-cs336/assignment1-basics/blob/main/cs336_assignment1_basics.pdf),
+adaptada al proyecto incremental de esta asignatura.
+
+| Semana | Clase 1 | Clase 2 |
+| --- | --- | --- |
+| S1 | [Assignment 1.1](output/pdf/semana01_clase01_assignment.pdf) | [Assignment 1.2](output/pdf/semana01_clase02_assignment.pdf) |
+| S3 | [Assignment 3.1](output/pdf/semana03_clase01_assignment.pdf) | [Assignment 3.2](output/pdf/semana03_clase02_assignment.pdf) |
+| S4 | [Assignment 4.1](output/pdf/semana04_clase01_assignment.pdf) | [Assignment 4.2](output/pdf/semana04_clase02_assignment.pdf) |
+| S5 | [Assignment 5.1](output/pdf/semana05_clase01_assignment.pdf) | [Assignment 5.2](output/pdf/semana05_clase02_assignment.pdf) |
+| S6 | [Assignment 6.1](output/pdf/semana06_clase01_assignment.pdf) | [Assignment 6.2](output/pdf/semana06_clase02_assignment.pdf) |
+
+El PDF es la guía de trabajo para el alumno; el `README.md`, el `problem/`,
+los tests y los `guides/` de cada semana siguen siendo la fuente de detalle
+técnico y de preparación docente.
+
 ## Cómo interpretar el material
 
 La estructura de una semana distingue claramente el material para preparar la
