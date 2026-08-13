@@ -8,14 +8,17 @@ El material completo está en
 Incluye dos clases, dos prácticas de notebook, una ficha de proyecto, una guía
 docente y el dataset didáctico en `data/raw/heart.csv`.
 
-## Clase 1 — Del prototipo a la operación
+## Clase 1 — Del prototipo a la operación y puesta a punto
 
 Contenido conceptual y de diseño: diferencia entre prototipo y producción,
 unidades de evidencia de MLflow, riesgos iniciales y lectura crítica de un
 notebook heredado.
 
-La práctica consiste en completar la ficha de proyecto con una decisión, los
-límites del dato y riesgos con propietario y mitigación.
+El assignment de esta clase es preparar el entorno para la clase 2: instalar
+`uv`, Git y, en Windows, Git Bash si no están disponibles, y crear una cuenta
+de Databricks Free Edition. La evidencia son las versiones verificadas, el
+acceso al workspace y cualquier bloqueo documentado. La ficha de proyecto no
+forma parte de este assignment.
 
 [Material de la clase 1](modules/01-mlflow-databricks-foundations/sessions/01-prototipo-a-operacion/README.md)
 
@@ -29,9 +32,10 @@ También se trabaja AgentOps/LLMOps con trazas y evaluación determinista.
 
 ## Prácticas y entregables
 
+- [Assignment de puesta a punto](../assignments/semana01_clase01_assignment.pdf): `uv`, Git, Git Bash en Windows y cuenta de Databricks Free Edition.
 - [Práctica de ciclo de vida de ML](modules/01-mlflow-databricks-foundations/exercises/01_tracking_mlops/README.md): runs, gate, Registry y API local.
 - [Práctica de AgentOps y LLMOps](modules/01-mlflow-databricks-foundations/exercises/02_agent_llmops/README.md): trazas, evaluación y fallos controlados.
-- [Ficha de proyecto y riesgos](modules/01-mlflow-databricks-foundations/exercises/01_project_risks_and_tracking.md): entregable común de la semana.
+- [Assignment técnico de la clase 2](../assignments/semana01_clase02_assignment.pdf): evidencia trazable de MLflow, AgentOps y API local.
 
 ## Entorno
 

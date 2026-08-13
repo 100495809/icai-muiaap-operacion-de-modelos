@@ -23,13 +23,16 @@ de los notebooks anteriores. Identifica rutas frágiles, configuración codifica
 registro de riesgos y el peligro de interpretar una predicción como consejo
 clínico.
 
-### Extensión independiente (35 min)
+### Puesta a punto del entorno (20 min)
 
-En parejas, completa el borrador de
-[`s01_project_record.yaml`](../../examples/s01_project_record.yaml) con una
-decisión, dos límites del dato y tres riesgos con propietario y mitigación.
+El assignment de la clase 1 no pide todavía analizar el notebook ni completar
+una ficha de riesgos. Cada estudiante instala y verifica `uv`, Git y, si usa
+Windows, Git Bash. Después crea una cuenta de Databricks Free Edition y
+confirma que puede entrar en su workspace. Los problemas se documentan con el
+comando ejecutado y el mensaje de error, sin compartir credenciales.
 
 ### Debrief (15 min)
 
 Cada pareja comparte un riesgo que MLflow puede hacer visible y otro que exige
-una decisión humana o de gobernanza.
+una decisión humana o de gobernanza. La clase 2 usará el entorno ya preparado
+para construir la evidencia técnica.

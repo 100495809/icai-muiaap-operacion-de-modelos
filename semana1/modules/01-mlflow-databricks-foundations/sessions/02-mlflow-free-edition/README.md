@@ -32,7 +32,7 @@ y abre la traza resultante.
 El alumnado inicia las versiones sin resolver
 [`01_tracking_mlops.ipynb`](../../notebooks/01_tracking_mlops.ipynb) y
 [`02_agent_llmops.ipynb`](../../notebooks/02_agent_llmops.ipynb), siguiendo la
-[práctica de semana 01](../../exercises/01_project_risks_and_tracking.md). El
+[práctica de ciclo de vida de semana 01](../../exercises/01_tracking_mlops/README.md). El
 ciclo ML completo requiere 2–3 horas adicionales fuera de clase.
 
 ### Debrief (15 min)

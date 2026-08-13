@@ -20,7 +20,7 @@ prototipo → tracking → proyecto reproducible → inferencia local
 
 | Semana | Contenido principal | Assignment / entregable | Continuidad |
 | --- | --- | --- | --- |
-| [S1](semana1/) | Prototipo frente a producción, ciclo de vida de IA, MLflow, Databricks, AgentOps y LLMOps. | Ficha inicial de proyecto y riesgos; runs trazables, gate, modelo registrado, API local y evaluación determinista. | Define el caso, los riesgos y la evidencia que se exigirá al proyecto. |
+| [S1](semana1/) | Prototipo frente a producción, ciclo de vida de IA, MLflow, Databricks, AgentOps y LLMOps. | Entorno local preparado; después, runs trazables, gate, modelo registrado, API local y evaluación determinista. | La clase 1 prepara herramientas y acceso; la clase 2 inicia la evidencia técnica del proyecto. |
 | [S2](semana2/) | Estructura de proyecto, entornos, dependencias y reproducibilidad con `uv`/Poetry. | Repositorio GitHub funcional, `README`, `pyproject`, lockfile, `.gitignore`, `src/`, tests y comando de arranque. | Convierte la ficha de S1 en un proyecto que otra persona puede clonar. |
 | [S3](semana3/) | Inferencia, preprocesado y contratos de entrada/salida. | Módulo local de inferencia reutilizable, CLI/script y pruebas de casos válidos e inválidos. | Separa entrenamiento, artefacto, preprocesado e inferencia. |
 | [S4](semana4/) | Serialización, manifiesto, formatos y validación de datos. | Bundle con `manifest.json` y `model.joblib`, carga segura, validación Pydantic y prueba de humo. | Empaqueta el módulo de S3 para que pueda consumirse sin conocer su interior. |
@@ -50,11 +50,11 @@ adaptada al proyecto incremental de esta asignatura.
 
 | Semana | Clase 1 | Clase 2 |
 | --- | --- | --- |
-| S1 | [Assignment 1.1](output/pdf/semana01_clase01_assignment.pdf) | [Assignment 1.2](output/pdf/semana01_clase02_assignment.pdf) |
-| S3 | [Assignment 3.1](output/pdf/semana03_clase01_assignment.pdf) | [Assignment 3.2](output/pdf/semana03_clase02_assignment.pdf) |
-| S4 | [Assignment 4.1](output/pdf/semana04_clase01_assignment.pdf) | [Assignment 4.2](output/pdf/semana04_clase02_assignment.pdf) |
-| S5 | [Assignment 5.1](output/pdf/semana05_clase01_assignment.pdf) | [Assignment 5.2](output/pdf/semana05_clase02_assignment.pdf) |
-| S6 | [Assignment 6.1](output/pdf/semana06_clase01_assignment.pdf) | [Assignment 6.2](output/pdf/semana06_clase02_assignment.pdf) |
+| S1 | [Assignment 1.1](assignments/semana01_clase01_assignment.pdf) | [Assignment 1.2](assignments/semana01_clase02_assignment.pdf) |
+| S3 | [Assignment 3.1](assignments/semana03_clase01_assignment.pdf) | [Assignment 3.2](assignments/semana03_clase02_assignment.pdf) |
+| S4 | [Assignment 4.1](assignments/semana04_clase01_assignment.pdf) | [Assignment 4.2](assignments/semana04_clase02_assignment.pdf) |
+| S5 | [Assignment 5.1](assignments/semana05_clase01_assignment.pdf) | [Assignment 5.2](assignments/semana05_clase02_assignment.pdf) |
+| S6 | [Assignment 6.1](assignments/semana06_clase01_assignment.pdf) | [Assignment 6.2](assignments/semana06_clase02_assignment.pdf) |
 
 El PDF es la guía de trabajo para el alumno; el `README.md`, el `problem/`,
 los tests y los `guides/` de cada semana siguen siendo la fuente de detalle
@@ -104,13 +104,17 @@ con el siguiente ciclo:
 
 #### S1 — Operación observable
 
-Trabaja en Databricks Free Edition con modo determinista cuando sea posible.
-Completa la ficha de proyecto y riesgos, ejecuta el notebook de tracking,
-registra parámetros, métricas, artefactos y tags, aplica un gate sobre
-validación, reserva test para el ganador, registra el modelo y prueba la API
-local. Después completa la traza y evaluación de AgentOps/LLMOps sin pegar
-secretos. Entrega los identificadores de runs, la regla del gate, riesgos con
-propietario y evidencias de éxito y error de la API.
+En la clase 1 prepara el entorno: instala `uv`, Git y, si usas Windows, Git
+Bash; después crea y verifica la cuenta de Databricks Free Edition. Entrega
+versiones, confirmación de acceso y cualquier bloqueo sin compartir secretos.
+
+En la clase 2 trabaja en Databricks Free Edition con modo determinista cuando
+sea posible. Ejecuta el notebook de tracking, registra parámetros, métricas,
+artefactos y tags, aplica un gate sobre validación, reserva test para el
+ganador, registra el modelo y prueba la API local. Después completa la traza y
+evaluación de AgentOps/LLMOps sin pegar secretos. Entrega los identificadores
+de runs, la regla del gate, riesgos observados y evidencias de éxito y error
+de la API.
 
 #### S2 — Proyecto reproducible
 

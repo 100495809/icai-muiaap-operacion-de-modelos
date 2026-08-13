@@ -32,7 +32,7 @@ from reportlab.platypus import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_DIR = ROOT / "output" / "pdf"
+OUTPUT_DIR = ROOT / "assignments"
 LOGO = ROOT / "assets" / "comillas_logo.jpg"
 
 INK = colors.HexColor("#18212B")
@@ -433,62 +433,64 @@ ASSIGNMENTS = [
     assignment(
         1,
         1,
-        "Ficha de proyecto y auditoria de prototipo",
-        "De un notebook experimental a una decision operable",
-        "90 min + 30 min de puesta en comun",
-        "Parejas",
-        "Caso de proyecto y notebook heredado",
+        "Configuracion inicial del entorno",
+        "Dejar listo el equipo para la primera practica tecnica",
+        "45-60 min antes de la clase 2",
+        "Individual",
+        "Ordenador personal y acceso a internet",
         (
-            "Analizar un prototipo de IA, distinguir experimento de servicio y "
-            "dejar una ficha inicial con riesgos, propietarios, mitigaciones y "
-            "evidencias que el proyecto debera producir."
+            "Instalar y verificar uv, Git y, si corresponde, Git Bash. Crear "
+            "ademas una cuenta de Databricks Free Edition para poder empezar la "
+            "practica de MLflow en la clase 2."
         ),
         [
-            "La semana 1 inaugura el proyecto: no se busca aun una metrica alta, sino hacer explicito que tendria que ser cierto para operar el modelo.",
-            "Usa el notebook heredado y la plantilla de ficha; no borres el prototipo original.",
-            "El analisis debe separar datos, entrenamiento, artefacto, inferencia, usuario y operacion.",
-            "La ficha sera la referencia de riesgo para las decisiones tecnicas de las semanas siguientes.",
+            "Esta practica es de puesta a punto: no exige analizar un notebook ni entregar una ficha de riesgos.",
+            "Si una herramienta ya esta instalada, conserva la instalacion y verifica su version.",
+            "En Windows, Git Bash se instala como parte de Git for Windows; en macOS y Linux se usa la terminal del sistema.",
+            "En Databricks selecciona Free Edition, no Free Trial, y no introduzcas datos de pago.",
         ],
         [
-            "notebooks/winequality-eda-model-87-accuracy.ipynb o el prototipo asignado por el docente",
-            "exercises/01_project_risks_and_tracking.md",
-            "examples/s01_project_record.yaml como plantilla de estructura",
-            "Ficha de riesgos: datos, reproducibilidad, sesgo, seguridad, coste y operacion",
+            "Documentacion oficial de instalacion de uv",
+            "Instalador oficial de Git; Git for Windows incluye Git Bash",
+            "Pagina oficial de alta de Databricks Free Edition",
+            "Una terminal local y un navegador actualizado",
         ],
         [
-            ("Reconstruye el caso", "Describe quien usa el modelo, que entrada recibe, que salida produce y que decision podria apoyar. Señala explicitamente lo que el notebook no demuestra."),
-            ("Audita el prototipo", "Localiza rutas personales, valores codificados, semillas ausentes, datos no versionados, entrenamiento mezclado con inferencia y cualquier paso que no se pueda repetir."),
-            ("Prioriza riesgos", "Registra al menos cinco riesgos con impacto, probabilidad, propietario, mitigacion y evidencia de cierre. No uses 'mejorar el modelo' como mitigacion generica."),
-            ("Define el minimo operable", "Escribe tres criterios de aceptacion para la siguiente semana: reproducibilidad, contrato, trazabilidad o seguridad. Explica por que cada criterio importa."),
-            ("Prepara el handoff", "Entrega una ficha que otra pareja pueda leer antes de S2 y usar para decidir que debe quedar fuera del notebook."),
+            ("Comprueba el punto de partida", "Abre una terminal y verifica si ya responden uv --version y git --version. En Windows, abre tambien Git Bash y ejecuta bash --version."),
+            ("Instala uv", "Sigue el instalador oficial para tu sistema operativo. Cierra y abre de nuevo la terminal si el comando no aparece en PATH."),
+            ("Instala Git y Git Bash", "En Windows usa Git for Windows y confirma que Git Bash aparece en el menu de aplicaciones. En macOS o Linux instala Git y verifica la terminal disponible."),
+            ("Crea el workspace", "Registra una cuenta de Databricks Free Edition, completa el alta y comprueba que puedes entrar en tu workspace sin iniciar un trial de pago."),
+            ("Prepara la evidencia", "Anota sistema operativo, versiones de uv y Git, resultado de bash --version cuando aplique y la confirmacion de acceso al workspace. Oculta correos, tokens y datos personales."),
         ],
         [
-            ("Ficha de proyecto", "Contexto, usuario, entrada, salida, limite de uso y criterio de exito."),
-            ("Matriz de riesgos", "Cinco riesgos priorizados, propietario, mitigacion y evidencia esperada."),
-            ("Auditoria del notebook", "Al menos ocho observaciones concretas con archivo/celda o referencia local."),
-            ("Decision de continuidad", "Tres requisitos que S2 debe resolver y una pregunta abierta para el equipo."),
+            ("Checklist de herramientas", "Sistema operativo, version de uv, version de Git y version de Bash cuando corresponda."),
+            ("Acceso a Databricks", "Confirmacion de entrada al workspace de Free Edition, sin credenciales ni datos de pago."),
+            ("Incidencias", "Si algo falla, mensaje de error, paso intentado y siguiente accion; no basta con decir que no funciona."),
         ],
         [
-            "Otra pareja puede explicar el caso sin abrir el notebook.",
-            "Cada riesgo tiene un propietario y una mitigacion verificable.",
-            "La ficha distingue prototipo, artefacto, inferencia y servicio.",
-            "No se incluyen datos sensibles, credenciales ni afirmaciones clinicas.",
-            "La entrega identifica evidencia pendiente, no solo intenciones.",
+            "uv --version devuelve una version y el comando funciona en una terminal nueva.",
+            "git --version devuelve una version; en Windows Git Bash tambien abre y ejecuta bash --version.",
+            "La cuenta de Databricks permite entrar en un workspace Free Edition.",
+            "La evidencia permite al docente identificar rapidamente quien esta bloqueado y por que.",
+            "No se entregan contrasenas, tokens, correos completos ni datos de pago.",
         ],
-        [("Comprension del caso y limites", "2"), ("Riesgos accionables", "3"), ("Auditoria tecnica", "3"), ("Claridad del handoff", "2")],
+        [("uv y verificacion", "3"), ("Git y Git Bash", "3"), ("Databricks Free Edition", "3"), ("Evidencia y seguridad", "1")],
         [
-            "Abrir la ficha y el notebook asignado.",
-            "Completar el YAML o Markdown de proyecto y riesgos.",
-            "Revisar la entrega con otra pareja usando la matriz de criterios.",
-        ],
-        [
-            "No conviertas un riesgo en una solucion sin propietario ni comprobacion.",
-            "No presentes la accuracy del notebook como evidencia suficiente para produccion.",
-            "Si el caso usa pacientes, tratalo solo como practica educativa y no como herramienta clinica.",
+            "Ejecutar uv --version.",
+            "Ejecutar git --version.",
+            "En Windows, abrir Git Bash y ejecutar bash --version.",
+            "Entrar en el workspace de Databricks Free Edition.",
         ],
         [
-            "semana1/modules/01-mlflow-databricks-foundations/exercises/01_project_risks_and_tracking.md",
-            "semana1/modules/01-mlflow-databricks-foundations/examples/s01_project_record.yaml",
+            "No instales todavia las dependencias del proyecto: la estructura y el entorno del repositorio se trabajaran en S2.",
+            "No selecciones Free Trial ni introduzcas tarjeta para esta asignatura.",
+            "No compartas credenciales ni capturas con informacion personal visible.",
+        ],
+        [
+            "uv: docs.astral.sh/uv/getting-started/installation/",
+            "Git: git-scm.com/install/",
+            "Git for Windows: gitforwindows.org/",
+            "Databricks Free Edition: docs.databricks.com/aws/en/getting-started/free-edition",
         ],
     ),
     assignment(
@@ -498,14 +500,14 @@ ASSIGNMENTS = [
         "Runs comparables, gate, Registry, API local y evaluacion",
         "2 horas en clase + trabajo autonomo",
         "Parejas en Databricks Free Edition",
-        "Assignment 1.1 y acceso a Databricks",
+        "Assignment 1.1 completado y acceso a Databricks",
         (
             "Construir evidencia trazable de un ciclo de ML: comparar candidatos, "
             "aplicar un gate sin contaminar test, registrar el ganador, servirlo "
             "localmente y completar una traza y evaluacion determinista de agente."
         ),
         [
-            "La ficha y los riesgos de la clase 1 son el criterio de contexto del experimento.",
+            "La clase 1 deja preparado el equipo y el workspace; la ficha de operacion se construye dentro de esta practica.",
             "El modo obligatorio de AgentOps/LLMOps es determinista; una llamada real a un endpoint es opcional y solo se hace si el docente lo indica.",
             "Cada run debe ser comparable: mismo split, nombres estables, tags de contexto y artefactos auditables.",
             "La API local es una practica de contrato y observabilidad; no es un despliegue publico ni sustituye Model Serving.",
@@ -513,7 +515,7 @@ ASSIGNMENTS = [
         [
             "notebooks/01_tracking_mlops.ipynb",
             "notebooks/02_agent_llmops.ipynb con USE_LLM = False",
-            "Databricks Experiments, Unity Catalog si esta disponible y la ficha de S1",
+            "Databricks Experiments, Unity Catalog si esta disponible y el entorno verificado en S1.1",
             "exercise/01_tracking_mlops y exercise/02_agent_llmops como guias de detalle",
         ],
         [
@@ -528,7 +530,7 @@ ASSIGNMENTS = [
             ("Decision de modelo", "Regla del gate, ganador, test reservado, version y alias."),
             ("API local", "Resultados de checks validos e invalidos, identificador del run y apagado confirmado."),
             ("AgentOps/LLMOps", "Identificador de traza, scorer ejecutado y limite del criterio."),
-            ("Ficha actualizada", "Riesgos priorizados y evidencia nueva que los cubre o deja abiertos."),
+            ("Ficha de operacion", "Experimento, gate, riesgos observados y evidencia nueva o pendiente."),
         ],
         [
             "Los runs contienen contexto suficiente para comparar y reproducir.",

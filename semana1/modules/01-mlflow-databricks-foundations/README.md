@@ -39,8 +39,10 @@ registra `Champion` y prueba una API HTTP local que carga el pickle ganador.
 
 ### 3. Extensión independiente — Clase 2, segunda hora (60 min)
 
-El alumnado inicia la [práctica](exercises/01_project_risks_and_tracking.md) en
-clase y termina el ciclo profundo como trabajo autónomo. Después ejecuta el modo determinista de
+El alumnado inicia la [práctica de ciclo de vida](exercises/01_tracking_mlops/README.md)
+en clase y termina el ciclo profundo como trabajo autónomo. La ficha de
+operación se completa como parte de esta práctica, no como assignment de la
+clase 1. Después ejecuta el modo determinista de
 [`notebooks/02_agent_llmops_solucion.ipynb`](notebooks/02_agent_llmops_solucion.ipynb), inspecciona la
 traza y ejecuta el *scorer* de código. Si la cuenta tiene capacidad y el docente
 lo indica, habilita la llamada a un endpoint como extensión; nunca con una clave
@@ -63,7 +65,6 @@ pegada en el notebook.
 | `notebooks/02_agent_llmops_solucion.ipynb` | Solución docente de AgentOps/LLMOps. |
 | `exercises/01_tracking_mlops/README.md` | Guía de alumno para el tracking clásico. |
 | `exercises/02_agent_llmops/README.md` | Guía de alumno para trazas y evaluación. |
-| `exercises/01_project_risks_and_tracking.md` | Entregable individual o por pareja. |
 | `examples/s01_project_record.yaml` | Plantilla de la ficha de proyecto y riesgos. |
 | `instructor/README.md` | Preparación y guion para el docente. |
 
