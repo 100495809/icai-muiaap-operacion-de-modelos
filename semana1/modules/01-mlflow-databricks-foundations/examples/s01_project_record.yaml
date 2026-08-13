@@ -9,14 +9,14 @@ data:
   source: "data/raw/WineQT.csv (caso didáctico del repositorio)"
   contains_personal_data: false
   limitations:
-    - "quality_high vale 1 cuando quality >= 6; el umbral es una decisión didáctica."
+    - "El target es quality multiclase (3–8); para XGBoost se codifica de forma reversible como quality_class = quality - 3."
     - "No representa una población vinícola completa ni autoriza decisiones comerciales."
 evidence:
   mlflow_experiment: "experimento asociado al notebook de Free Edition"
   batch_id: "xxxxxxxx"
   candidate_runs: 7
   selection_gate:
-    minimum_validation_f1_macro: 0.70
+    minimum_validation_f1_macro: 0.28
     ranking:
       - "validation.f1_macro DESC"
       - "validation.accuracy DESC"
@@ -50,7 +50,7 @@ deployment:
   api_stopped: true
 risks:
   - id: R1
-    risk: "Uso de quality_high como garantía de calidad comercial"
+    risk: "Uso de una predicción de quality como garantía de calidad comercial"
     impact: high
     likelihood: medium
     owner: "equipo de producto"

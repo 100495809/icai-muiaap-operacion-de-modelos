@@ -9,12 +9,15 @@ de vida completo:
 
 Cada candidato contendrá inputs de datos, parámetros, métricas de validación,
 matriz de confusión, reporte por clase, gobierno, modelo MLflow con firma y un
-`model.joblib`. La etiqueta de trabajo será `quality_high`: vale 1 si
-`quality >= 6` y 0 en otro caso. Compararás candidatos `ExtraTreesClassifier` y
-`XGBClassifier` bajo el mismo contrato. Después registrarás únicamente el ganador, le asignarás el alias
+`model.joblib`. La etiqueta de trabajo será la calidad original, `quality`, en
+clasificación multiclase. Para que XGBoost pueda entrenar, se codifica de forma
+reversible como `quality_class = quality - 3` (clases 0–5 equivalentes a
+calidades 3–8); la API devuelve siempre las calidades originales. Compararás
+candidatos `ExtraTreesClassifier` y `XGBClassifier` bajo el mismo contrato.
+Después registrarás únicamente el ganador, le asignarás el alias
 `Champion` y servirás su `model.joblib` mediante una API HTTP local.
 
-El resultado es evidencia didáctica: el umbral no es una norma comercial ni
+El resultado es evidencia didáctica: la predicción no es una norma comercial ni
 autoriza decisiones sobre la calidad de un producto real.
 
 ## Smoke test local sin MLflow
@@ -90,7 +93,7 @@ equipo. En sesiones posteriores podrás compararlo con `autolog`.
 
 1. Recupera sólo runs de tu alias, lote y fase con `mlflow.search_runs()`.
 2. Aplica la regla acordada antes de ver resultados: `validation.f1_macro >=
-   0,70`; después F1 macro descendente, accuracy descendente y latencia
+   0,28`; después F1 macro descendente, accuracy descendente y latencia
    ascendente.
 3. Si nadie supera el gate, detente. Rebajar el umbral después de observar los
    resultados convierte el gate en decoración.

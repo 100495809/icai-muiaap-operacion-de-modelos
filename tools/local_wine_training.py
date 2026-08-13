@@ -40,7 +40,12 @@ RANDOM_STATE = 42
 TRAIN_SIZE = 0.70
 VALIDATION_SIZE = 0.15
 TEST_SIZE = 0.15
-MIN_VALIDATION_F1_MACRO = 0.70
+# WineQT conserva las calidades 3..8. XGBoost requiere etiquetas consecutivas
+# desde cero, por lo que ambos candidatos usan quality_class = quality - 3.
+QUALITY_MIN = 3
+QUALITY_MAX = 8
+NUM_CLASSES = QUALITY_MAX - QUALITY_MIN + 1
+MIN_VALIDATION_F1_MACRO = 0.28
 
 
 def metrics(model: Pipeline, features: pd.DataFrame, labels: pd.Series) -> dict[str, float]:
@@ -98,8 +103,9 @@ def candidates() -> list[tuple[str, str, Pipeline]]:
                     subsample=0.9,
                     colsample_bytree=0.9,
                     reg_lambda=1.0,
-                    objective="binary:logistic",
-                    eval_metric="logloss",
+                    objective="multi:softprob",
+                    num_class=NUM_CLASSES,
+                    eval_metric="mlogloss",
                     tree_method="hist",
                     random_state=RANDOM_STATE,
                     n_jobs=-1,
@@ -114,18 +120,18 @@ def candidates() -> list[tuple[str, str, Pipeline]]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=Path, default=DATASET)
-    parser.add_argument(
-        "--positive-at-least",
-        type=int,
-        default=6,
-        help="Collapse quality into 0/1: 1 when quality is at least this value (default: 6).",
-    )
     args = parser.parse_args()
 
     data = pd.read_csv(args.dataset)
     X = data[FEATURES]
-    y = (data["quality"] >= args.positive_at_least).astype(int)
-    target_description = f"quality >= {args.positive_at_least}"
+    quality_values = sorted(data["quality"].unique().tolist())
+    assert quality_values == list(range(QUALITY_MIN, QUALITY_MAX + 1)), (
+        f"Se esperaban calidades consecutivas {QUALITY_MIN}..{QUALITY_MAX}; recibidas {quality_values}."
+    )
+    y = data["quality"].astype(int) - QUALITY_MIN
+    target_description = (
+        f"quality multiclase {quality_values} (codificada como quality_class=quality-{QUALITY_MIN})"
+    )
     X_train_full, X_test, y_train_full, y_test = train_test_split(
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
     )
@@ -152,7 +158,7 @@ def main() -> None:
         comparison.loc[comparison["candidate"] == "extra_trees_300_leaf_1", "f1_macro"].iloc[0]
     )
     assert reference_f1 >= MIN_VALIDATION_F1_MACRO, (
-        "El candidato de referencia no supera el gate; revisa el split, el dataset o las versiones."
+        "El candidato de referencia no supera el gate multiclase; revisa el split, el dataset o las versiones."
     )
     print("LOCAL RUN (MLflow disabled)")
     print(f"dataset={args.dataset}")
