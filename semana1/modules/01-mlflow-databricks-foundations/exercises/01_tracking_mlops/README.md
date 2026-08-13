@@ -60,7 +60,7 @@ reinicias desde el principio se generará otro lote.
 2. Usa un alias anónimo de 3–24 caracteres; no uses correo, nombre o matrícula.
 3. Valida columnas, target, filas, duplicados y nulos. Los nulos se aceptan
    porque el pipeline los imputa; una columna obligatoria ausente no.
-4. Divide de forma estratificada: 60 % train, 20 % validación y 20 % test.
+4. Divide de forma estratificada: 70 % train, 15 % validación y 15 % test.
    **No leas test** antes de elegir el ganador.
 5. Construye un `Pipeline` que incluya imputación y el estimador de cada
    candidato (`ExtraTreesClassifier` o `XGBClassifier`). El mismo objeto debe

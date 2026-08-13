@@ -1,7 +1,7 @@
 """Run the week 1 Wine Quality experiment locally, without MLflow.
 
 This is a small diagnostic harness for the teaching notebook. It uses the same
-60/20/20 stratified split and reports validation/test metrics for candidate
+70/15/15 stratified split and reports validation/test metrics for candidate
 pipelines, including the ExtraTrees configuration used by the notebook and an
 XGBoost candidate. Test is printed only for the best validation candidate.
 """
@@ -37,6 +37,10 @@ FEATURES = [
     "alcohol",
 ]
 RANDOM_STATE = 42
+TRAIN_SIZE = 0.70
+VALIDATION_SIZE = 0.15
+TEST_SIZE = 0.15
+MIN_VALIDATION_F1_MACRO = 0.70
 
 
 def metrics(model: Pipeline, features: pd.DataFrame, labels: pd.Series) -> dict[str, float]:
@@ -121,12 +125,12 @@ def main() -> None:
     y = (data["quality"] >= args.positive_at_least).astype(int)
     target_description = f"quality >= {args.positive_at_least}"
     X_train_full, X_test, y_train_full, y_test = train_test_split(
-        X, y, test_size=0.20, random_state=RANDOM_STATE, stratify=y
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
     )
     X_train, X_valid, y_train, y_valid = train_test_split(
         X_train_full,
         y_train_full,
-        test_size=0.25,
+        test_size=VALIDATION_SIZE / (TRAIN_SIZE + VALIDATION_SIZE),
         random_state=RANDOM_STATE,
         stratify=y_train_full,
     )
@@ -142,11 +146,20 @@ def main() -> None:
     comparison = pd.DataFrame(rows).sort_values(
         ["f1_macro", "f1_weighted", "accuracy"], ascending=False
     )
+    reference_f1 = float(
+        comparison.loc[comparison["candidate"] == "extra_trees_300_leaf_1", "f1_macro"].iloc[0]
+    )
+    assert reference_f1 >= MIN_VALIDATION_F1_MACRO, (
+        "El candidato de referencia no supera el gate; revisa el split, el dataset o las versiones."
+    )
     print("LOCAL RUN (MLflow disabled)")
     print(f"dataset={args.dataset}")
     print(f"target={target_description}")
     print(f"xgboost={xgboost.__version__}")
-    print(f"split=train:{len(X_train)} validation:{len(X_valid)} test:{len(X_test)}")
+    print(
+        f"split={TRAIN_SIZE:.0%}/{VALIDATION_SIZE:.0%}/{TEST_SIZE:.0%} "
+        f"train:{len(X_train)} validation:{len(X_valid)} test:{len(X_test)}"
+    )
     print(comparison.head(15).to_string(index=False, float_format=lambda value: f"{value:.4f}"))
 
     best_name = str(comparison.iloc[0]["candidate"])
