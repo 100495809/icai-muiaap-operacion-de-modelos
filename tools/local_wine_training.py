@@ -65,13 +65,14 @@ def tree_pipeline(classifier) -> Pipeline:
     )
 
 
-def candidates() -> list[tuple[str, Pipeline]]:
-    result: list[tuple[str, Pipeline]] = []
+def candidates() -> list[tuple[str, str, Pipeline]]:
+    result: list[tuple[str, str, Pipeline]] = []
     for n_estimators in (300, 600):
         for min_samples_leaf in (1, 2, 3):
             result.append(
                 (
                     f"extra_trees_{n_estimators}_leaf_{min_samples_leaf}",
+                    "extra_trees",
                     tree_pipeline(
                         ExtraTreesClassifier(
                             n_estimators=n_estimators,
@@ -87,6 +88,7 @@ def candidates() -> list[tuple[str, Pipeline]]:
     result.append(
         (
             "xgboost_hist",
+            "xgboost",
             tree_pipeline(
                 XGBClassifier(
                     n_estimators=250,
@@ -137,10 +139,10 @@ def main() -> None:
 
     rows = []
     fitted = {}
-    for name, model in candidates():
+    for name, model_type, model in candidates():
         model.fit(X_train, y_train)
         validation = metrics(model, X_valid, y_valid)
-        rows.append({"candidate": name, **validation})
+        rows.append({"candidate": name, "model_type": model_type, **validation})
         fitted[name] = model
 
     comparison = pd.DataFrame(rows).sort_values(
