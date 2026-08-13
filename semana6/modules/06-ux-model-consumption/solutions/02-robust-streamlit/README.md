@@ -1,23 +1,26 @@
-# Solución — Interfaz robusta de inferencia
+# Solución — App de S5 evolucionada con Streamlit avanzado
 
-La solución separa la app Streamlit del controlador de UX y del gateway:
+La solución conserva el formulario de S5 y añade:
 
-- `presentation.py`: copy de calidad, confianza, latencia y errores;
-- `controller.py`: transiciones, medición y telemetría;
-- `gateway.py`: demo determinista y adaptador del bundle de S4;
+- `session.py`: inicialización idempotente y limpieza;
+- `policies.py`: confianza y latencia como políticas explícitas;
+- `controller.py`: estados, medición y errores;
 - `telemetry.py`: agregados sin payload;
-- `app.py`: formulario y renderizado.
+- `app.py`: `st.cache_resource`, `st.session_state`, `st.empty`/estado de carga,
+  retry y clear;
+- `gateway.py`: el mismo adaptador del bundle de S4.
 
-## Validación
+## Ejecución
 
 Desde `semana6/`:
 
 ```bash
 uv run pytest
-uv run ruff check modules/06-ux-model-consumption/solutions
-uv run ruff format --check modules/06-ux-model-consumption/solutions
+uv run ruff check modules/06-ux-model-consumption/solutions/02-robust-streamlit
+uv run ruff format --check modules/06-ux-model-consumption/solutions/02-robust-streamlit
+uv sync --extra app
+uv run streamlit run modules/06-ux-model-consumption/solutions/02-robust-streamlit/app.py
 ```
 
-La app puede ejecutarse con `uv sync --extra app` y el gateway demo. Para
-consumir un bundle real de S4, define `MODEL_UI_BUNDLE` antes de lanzar
-Streamlit.
+La demo usa `DemoGateway` por defecto. Para un bundle real, define
+`MODEL_UI_BUNDLE`. La app sigue sin conocer `joblib.load` ni el preprocesado.

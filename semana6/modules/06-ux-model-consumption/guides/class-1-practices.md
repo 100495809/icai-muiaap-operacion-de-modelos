@@ -1,35 +1,35 @@
-# Guion docente — Clase 1: diseñar una experiencia operable
+# Guion docente — Clase 1: de la app básica al estado explícito
 
-**Resultado:** cada pareja sale con una matriz de estados que conecta contratos,
-riesgos, mensajes y acciones. No implementa todavía la app.
+**Resultado:** cada pareja inspecciona su app de S5 y sale con un diseño
+implementable de sesión, caché y transiciones. No reescribe todavía el
+formulario.
 
 ## Preparación
 
-- Abrir el notebook [guiado](../sessions/01-ux-estados-confianza/notebooks/01-ux-modelo-guiada.ipynb).
-- Tener a mano el `manifest_example.json` de S4 y recordar las versiones del
-  contrato de S3.
-- Compartir solo el notebook del alumnado y la práctica 01; la solución se
-  mantiene cerrada.
-- Si se usa la app de S5, tener un screenshot de un resultado válido y otro de
-  un error. Si S5 aún no está disponible, el gateway demo cubre la sesión.
+- Pedir que cada pareja traiga la app de S5 funcionando.
+- Tener disponible la solución de S5 como snapshot común si alguna pareja no
+  terminó su app.
+- Abrir el [notebook guiado](../sessions/01-ux-estados-confianza/notebooks/01-ux-modelo-guiada.ipynb).
+- Recordar que S4 sigue siendo la frontera de inferencia y que S6 no copia su
+  preprocesado.
 
 ## Secuencia de 120 minutos
 
-| Minutos | Acción docente | Actividad del alumnado | Evidencia |
+| Minutos | Acción docente | Actividad | Evidencia |
 | ---: | --- | --- | --- |
-| 0–15 | Recuperar el riesgo de S1: una salida no es una decisión. | Marcan palabras prohibidas para la confianza. | “No es garantía”, “requiere revisión”. |
-| 15–30 | Mostrar `manifest.json`, `model_version` y `preprocessing_version`. | Deciden qué metadatos son útiles para la persona y cuáles son internos. | Tabla de trazabilidad. |
-| 30–45 | Dibujar la máquina de estados. | Añaden idle, loading, success y error. | Transiciones y acción de recuperación. |
-| 45–60 | Comparar confianza 0.42/0.74/0.93. | Escriben copy de tres niveles. | Mensajes sin sobreafirmación. |
-| 60–75 | Ejecutar el gateway demo. | Predicen el estado final y la telemetría. | Hoja de predicciones. |
-| 75–95 | Provocar error de contrato y backend. | Redactan mensajes sin traceback. | Código, mensaje, acción y request ID. |
-| 95–110 | Medir una latencia artificial. | Deciden cómo distinguir resultado válido y servicio lento. | Regla de latencia. |
-| 110–120 | Debrief. | Entregan la matriz y dos invariantes. | Prerequisito para el taller. |
+| 0–15 | Ejecutar una app de S5 | Señalan líneas de formulario, gateway y resultado. | Mapa de S5. |
+| 15–30 | Provocar reruns | Predicen qué se pierde y qué se recalcula. | Tabla variable → ciclo de vida. |
+| 30–45 | Introducir `session_state` | Diseñan claves mínimas. | `last_state`, `telemetry`. |
+| 45–60 | Introducir `cache_resource` | Deciden qué recurso debe cachearse. | Regla de caché. |
+| 60–75 | Máquina de estados | Definen eventos y salidas. | Diagrama de transición. |
+| 75–90 | Ejecutar demo avanzada | Comparan éxito, error, reintento y limpieza. | Predicción frente a resultado. |
+| 90–105 | Confianza y latencia | Redactan copy y umbrales como política de UX. | Mensajes revisados. |
+| 105–120 | Preparar taller | Relacionan cada requisito con una función/test. | Orden de implementación. |
 
-## Invariantes que debe conservar la solución
+## Invariantes
 
-- El modelo y el preprocesado siguen siendo responsabilidad del gateway de S4.
-- `confidence` se muestra como señal, nunca como garantía.
-- Un error de contrato se puede corregir desde la UI sin leer una excepción
-  técnica.
-- La telemetría contiene agregados y versiones, no los valores del formulario.
+- El formulario de S5 no se duplica ni se rediseña sin motivo.
+- El bundle se carga como recurso, no en cada interacción.
+- Limpiar la pantalla no borra la telemetría de sesión.
+- La confianza no se presenta como certeza.
+- Un fallo visible tiene una recuperación y un `request_id`.

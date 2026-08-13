@@ -1,59 +1,52 @@
-# Semana 6 — UX para consumo de modelos
+# Módulo — Streamlit avanzado para consumo de modelos
 
-Objetivo de la unidad: convertir una inferencia correcta en una experiencia de
-consumo comprensible y operable. La interfaz debe hacer visible cuándo está
-trabajando, qué resultado recibió, qué incertidumbre acompaña a la predicción,
-cuánto tardó y qué puede hacer la persona ante un fallo.
+Este módulo recibe una app básica de S5 y la refactoriza para que el modelo se
+pueda consumir de forma más robusta dentro del modelo de ejecución de Streamlit.
 
-## Principio de diseño
-
-La interfaz no es otra capa de inferencia. El flujo conserva las fronteras de
-S3 y S4:
+## Arquitectura de continuidad
 
 ```text
-formulario -> request values -> gateway -> PredictionPayload -> vista UX
-                                      \-> model_version/preprocessing_version
+formulario de S5
+      ↓
+st.session_state ← PredictionController → InferenceGateway → bundle de S4
+      ↓                         ↓
+   UiState                 TelemetrySnapshot
+      ↓
+presentación Streamlit
 ```
 
-El gateway en modo empaquetado usa `load_model_bundle()` e
-`infer_wine_quality()` de la solución de la semana 4. La app no accede al
-estimador ni reconstruye el vector de once características. En S7, el mismo
-contrato `InferenceGateway` puede implementarse con un cliente HTTP.
+El formulario y los nombres de las features no se vuelven a diseñar. El
+trabajo nuevo es controlar el rerun y hacer explícita la experiencia de una
+petición.
 
-## Secuencia semanal
+## Secuencia
 
 | Sesión | Foco | Resultado |
 | --- | --- | --- |
-| 1 | UX para IA, errores, latencia, estados y confianza | La pareja entrega una matriz de estados y reglas de comunicación que respetan el contrato y los riesgos del caso. |
-| 2 | Taller de interfaz robusta | La pareja implementa un controlador probado y una demo Streamlit que consume un gateway local sin duplicar la inferencia. |
+| 1 | Reruns, sesión, caché y máquina de estados | La pareja entrega el mapa de transición de la app S5 y decide qué conservar. |
+| 2 | Refactorización avanzada | La pareja entrega la app S5 evolucionada con estado, errores, latencia y telemetría. |
 
 ## Material
 
 | Recurso | Uso |
 | --- | --- |
-| [Sesión 1](sessions/01-ux-estados-confianza/README.md) | Conceptos, demo de estados y notebook docente. |
-| [Sesión 2](sessions/02-interfaz-robusta/README.md) | Taller de implementación y debrief. |
-| [Práctica 01](exercises/01-ui-contract/problem/README.md) | Diseño de estados y mensajes antes de programar. |
-| [Práctica 02](exercises/02-robust-streamlit/README.md) | Starter con TODOs, pruebas y app Streamlit. |
-| [Solución docente](solutions/02-robust-streamlit/) | Referencia separada para el debrief. |
-| [Ejemplo ejecutable](examples/robust-ui/README.md) | Mapa de componentes y criterios de aceptación. |
+| [Sesión 1](sessions/01-ux-estados-confianza/README.md) | Conceptos, inspección de S5 y demo de transiciones. |
+| [Sesión 2](sessions/02-interfaz-robusta/README.md) | Taller de implementación sobre el snapshot de S5. |
+| [Práctica 01](exercises/01-ui-contract/problem/README.md) | Diseñar el estado y los eventos de la app existente. |
+| [Práctica 02](exercises/02-robust-streamlit/README.md) | Completar el refactor avanzado y sus pruebas. |
+| [Solución docente](solutions/02-robust-streamlit/) | Referencia del debrief. |
 
-## Contratos de UX que se evalúan
+## Decisiones avanzadas que se evalúan
 
-- `loading`: la persona sabe que la petición está en curso y no duplica el
-  envío accidentalmente;
-- `success`: se muestra la categoría, la confianza como señal orientativa, la
-  latencia y las versiones del bundle;
-- `error`: se muestra un mensaje accionable, un identificador de petición y una
-  recuperación posible, sin stack trace ni payload;
-- confianza baja: la UI recomienda revisión y nunca dice “seguro”, “garantizado”
-  o “diagnóstico”;
-- latencia alta: se comunica como señal técnica y se registra como agregado;
-- telemetría: solo cuenta peticiones, éxitos, errores, códigos y latencias.
+- `st.session_state` conserva solo estado de sesión, no payloads completos ni
+  secretos;
+- `st.cache_resource` evita cargar el bundle en cada rerun;
+- `PredictionController` permite probar la máquina de estados sin importar
+  Streamlit;
+- `st.empty`, `st.status` o un equivalente representan el estado de carga;
+- el resultado válido puede marcarse como lento sin convertirse en error;
+- los errores técnicos se traducen a mensajes y acciones de recuperación;
+- la telemetría registra agregados, códigos, latencias y versiones.
 
-## Relación con el roadmap
-
-S6 prepara la separación entre presentación e inferencia. No introduce HTTP ni
-autenticación: esas decisiones pertenecen a S7–S10. El objetivo es que en S7 se
-pueda reemplazar el gateway local por un cliente REST sin cambiar la política de
-estados ni la forma en que la interfaz comunica errores.
+S7 podrá sustituir `InferenceGateway` por un cliente HTTP sin rehacer la
+política de estados ni la pantalla básica.

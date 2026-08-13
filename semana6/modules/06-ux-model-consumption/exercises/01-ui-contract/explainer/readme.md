@@ -1,14 +1,19 @@
-# Explicación — Contrato de experiencia para una inferencia
+# Explicación — Rerun, sesión y estado de una petición
 
-Una interfaz de IA tiene un contrato además del contrato de datos. Debe
-explicar qué estado atraviesa la petición, qué significa la salida, qué puede
-hacer la persona ante un error y qué evidencia técnica acompaña al resultado.
+En S5, el script se vuelve a ejecutar cuando la persona interactúa. Una
+variable local puede desaparecer, mientras que `st.session_state` permite
+conservar información de la sesión. Eso no significa que debamos guardar todo:
+los valores completos del formulario no deben entrar automáticamente en la
+telemetría.
 
-La práctica no modifica el modelo. Usa las decisiones de S3 y S4 como límites:
+La separación que implementará S6 es:
 
-- las once features siguen siendo responsabilidad del contrato de entrada;
-- `quality_band`, `confidence`, `model_version` y
-  `preprocessing_version` son la salida disponible;
-- el manifiesto identifica el bundle, pero no convierte una predicción en una
-  garantía;
-- la telemetría de la interfaz registra agregados, no valores del formulario.
+```text
+st.session_state: estado observable y agregados de sesión
+st.cache_resource: gateway/bundle reutilizable
+controller: transiciones y errores
+gateway: contrato e inferencia de S4
+```
+
+Los umbrales de confianza y latencia son políticas de comunicación de la demo,
+no una calibración del modelo.

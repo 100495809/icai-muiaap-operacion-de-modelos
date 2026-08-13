@@ -1,18 +1,24 @@
-# Explicación — Separar UI, estado y gateway
+# Explicación — Evolucionar, no rehacer, la app de S5
 
-La app de S6 se organiza alrededor de una frontera pequeña:
+El starter representa el estado final de la práctica de S5 antes del refactor.
+La interfaz ya sabe dibujar el formulario. S6 introduce una capa que controla
+el ciclo de vida de la petición:
 
 ```text
-Streamlit -> PredictionController -> InferenceGateway -> S4
-                 |       |
-                 |       └── TelemetrySnapshot
-                 └── UiState / PredictionView / UserFacingError
+formulario S5
+      ↓
+session_state + controller
+      ↓
+InferenceGateway → bundle de S4
+      ↓
+UiState / PredictionView / UserFacingError
 ```
 
-`PredictionController` no sabe que existe Streamlit. Esto permite probar
-transiciones y errores con una función normal y deja a S7 sustituir el gateway
-por un cliente HTTP.
+`st.cache_resource` es para el gateway o el bundle reutilizable. No debe
+convertirse en una caché de respuestas por usuario. `st.session_state` conserva
+estado observable de la sesión, no sustituye a un almacén de datos ni autoriza
+a registrar el formulario completo.
 
-El gateway empaquetado es un adaptador: construye el `WineQualityRequest` de S4,
-llama a `infer_wine_quality()` y transforma su salida al payload que la UI
-necesita. La UI no conoce `joblib`, `predict_proba` ni el orden de features.
+El controlador no importa Streamlit para que sus transiciones puedan probarse
+con un reloj y un gateway falso. En S7, el mismo controlador podrá consumir un
+gateway HTTP.

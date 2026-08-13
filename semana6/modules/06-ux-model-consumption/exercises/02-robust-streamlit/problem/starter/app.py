@@ -1,13 +1,27 @@
-"""Starter de la app Streamlit de la semana 6."""
+"""Starter S6: snapshot de la app de S5 con cableado avanzado pendiente."""
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Any
 
 from model_ui.contracts import UiState
 from model_ui.controller import PredictionController
-from model_ui.gateway import InferenceGateway
-from model_ui.telemetry import Telemetry
+from model_ui.gateway import (
+    FEATURE_NAMES,
+    DemoGateway,
+    InferenceGateway,
+    PackagedBundleGateway,
+    UnavailableGateway,
+)
+from model_ui.session import (
+    LAST_STATE_KEY,
+    LAST_VALUES_KEY,
+    TELEMETRY_KEY,
+    clear_last_state,
+    initialize_session_state,
+)
 
 FEATURE_FIELDS = (
     ("fixed_acidity", "Fixed acidity", 0.0, 20.0, 7.4),
@@ -23,27 +37,56 @@ FEATURE_FIELDS = (
     ("alcohol", "Alcohol", 5.0, 20.0, 9.4),
 )
 
+assert tuple(field[0] for field in FEATURE_FIELDS) == FEATURE_NAMES
 
-def build_gateway() -> InferenceGateway:
-    """TODO: usa el bundle de MODEL_UI_BUNDLE o el DemoGateway."""
 
-    raise NotImplementedError("TODO: conecta la app al gateway sin inferir aquí")
+def build_gateway(bundle_value: str | None) -> InferenceGateway:
+    """Selecciona el bundle configurado o conserva el gateway demo de S5."""
+
+    if not bundle_value:
+        return DemoGateway()
+    try:
+        return PackagedBundleGateway.from_bundle_path(Path(bundle_value))
+    except Exception as error:  # noqa: BLE001 - se convierte en estado visible
+        return UnavailableGateway(str(error))
 
 
 def collect_values(st: Any) -> tuple[bool, dict[str, float]]:
-    """TODO: dibuja los once campos dentro de un formulario Streamlit."""
+    """Formulario heredado de S5; no es un TODO de esta semana."""
 
-    raise NotImplementedError("TODO: crea el formulario y devuelve submitted, values")
+    values: dict[str, float] = {}
+    with st.form("wine_quality_form"):
+        st.caption("Formulario de S5: la inferencia se envía al pulsar el botón.")
+        columns = st.columns(2)
+        for index, (name, label, minimum, maximum, default) in enumerate(
+            FEATURE_FIELDS
+        ):
+            with columns[index % 2]:
+                values[name] = st.number_input(
+                    label,
+                    min_value=minimum,
+                    max_value=maximum,
+                    value=default,
+                    key=f"input_{name}",
+                )
+        submitted = st.form_submit_button("Ejecutar inferencia")
+    return submitted, values
 
 
-def render_state(st: Any, state: UiState) -> None:
-    """TODO: renderiza idle/loading/success/error sin mostrar excepciones."""
+def get_cached_gateway(st: Any, bundle_value: str | None) -> InferenceGateway:
+    """TODO: usa `st.cache_resource` sobre el gateway, no sobre la respuesta."""
 
-    raise NotImplementedError("TODO: presenta el estado y sus acciones")
+    raise NotImplementedError("TODO: cachea el gateway heredado de S5")
+
+
+def render_state(st: Any, state: UiState, target: Any | None = None) -> None:
+    """TODO: presenta idle/loading/success/error en un target de Streamlit."""
+
+    raise NotImplementedError("TODO: renderiza el estado sin mostrar excepciones")
 
 
 def main() -> None:
-    """Punto de entrada opcional; la lógica importante debe quedar testeable."""
+    """Ejecuta la app de S5 con estado avanzado de S6."""
 
     try:
         import streamlit as st
@@ -54,20 +97,49 @@ def main() -> None:
 
     st.set_page_config(page_title="Wine Quality · S6", page_icon="🍷")
     st.title("Inferencia de calidad de vino")
-    if "telemetry" not in st.session_state:
-        st.session_state["telemetry"] = Telemetry()
-    if "gateway" not in st.session_state:
-        st.session_state["gateway"] = build_gateway()
-    if "last_state" not in st.session_state:
-        st.session_state["last_state"] = UiState(phase="idle")
+    st.caption("S6: la app de S5 ahora conserva estado y comunica la operación.")
+
+    initialize_session_state(st.session_state)
+    bundle_value = os.getenv("MODEL_UI_BUNDLE")
+    gateway = get_cached_gateway(st, bundle_value)
+    telemetry = st.session_state[TELEMETRY_KEY]
+    controller = PredictionController(gateway, telemetry=telemetry)
 
     submitted, values = collect_values(st)
+    state_slot = st.empty()
     if submitted:
-        controller = PredictionController(
-            st.session_state["gateway"], telemetry=st.session_state["telemetry"]
-        )
-        st.session_state["last_state"] = controller.submit(values)
-    render_state(st, st.session_state["last_state"])
+        st.session_state[LAST_VALUES_KEY] = values
+        with st.status("Ejecutando inferencia…", expanded=False) as status:
+            state = controller.submit(
+                values,
+                emit=lambda event: render_state(st, event, state_slot),
+            )
+            st.session_state[LAST_STATE_KEY] = state
+            status.update(
+                label=(
+                    "Inferencia completada"
+                    if state.phase == "success"
+                    else "La inferencia necesita atención"
+                ),
+                state="complete" if state.phase == "success" else "error",
+            )
+
+    if st.button("Limpiar último resultado"):
+        clear_last_state(st.session_state)
+        st.rerun()
+
+    state = st.session_state[LAST_STATE_KEY]
+    render_state(st, state)
+    if state.phase == "error" and st.session_state[LAST_VALUES_KEY]:
+        if st.button("Reintentar"):
+            retry_state = controller.submit(st.session_state[LAST_VALUES_KEY])
+            st.session_state[LAST_STATE_KEY] = retry_state
+            st.rerun()
+
+    st.divider()
+    st.subheader("Telemetría de la sesión")
+    st.json(telemetry.snapshot().__dict__)
+    st.caption("Solo se muestran agregados; no se guardan las features en Telemetry.")
 
 
 if __name__ == "__main__":

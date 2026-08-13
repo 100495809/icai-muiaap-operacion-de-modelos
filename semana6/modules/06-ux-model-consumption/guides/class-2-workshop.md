@@ -1,49 +1,34 @@
-# Guion docente — Clase 2: taller de interfaz robusta
+# Guion docente — Clase 2: refactor avanzado de la interfaz de S5
 
-**Resultado:** cada pareja entrega un controlador probado y una app Streamlit
-que consume el mismo gateway local que mañana podrá ser sustituido por HTTP.
+**Resultado:** cada pareja entrega la app de S5 evolucionada con estado,
+caché, máquina de estados y UX operable.
 
 ## Antes de empezar
 
-- Distribuir únicamente
-  `exercises/02-robust-streamlit/problem/starter/`.
+- Distribuir el snapshot de S5 y el starter de S6.
+- Aclarar que `collect_values()` ya está resuelto: no es el objetivo del
+  taller.
 - Mantener cerrada la solución hasta el debrief.
-- Explicar que las pruebas del starter son la especificación del comportamiento,
-  no una implementación para copiar.
-- No distribuir un `.joblib`: los tests y el `DemoGateway` permiten trabajar sin
-  artefactos binarios. El bundle real de S4 se usa como extensión docente.
+- Ejecutar primero los tests unitarios sin abrir todavía la app.
 
 ## Secuencia de 120 minutos
 
-| Minutos | Hito | Pista que se puede dar | Comprobación |
+| Minutos | Hito | Pista | Comprobación |
 | ---: | --- | --- | --- |
-| 0–10 | Suite roja y seams | “Lee qué observa el consumidor, no cómo se implementa.” | Tests de vista, error, estado y telemetría localizados. |
-| 10–30 | Vista de predicción | “Separa nivel de confianza del texto que lo explica.” | Umbrales y copy coherentes. |
-| 30–55 | Errores | “El usuario necesita acción y request ID, no stack trace.” | Códigos estables y recuperación. |
-| 55–85 | Controlador | “Emite loading antes de llamar al gateway; mide con monotonic clock.” | Transiciones y latencia. |
-| 85–105 | Telemetría | “Cuenta, no captures el formulario.” | Snapshot sin features. |
-| 105–115 | Adaptador Streamlit | “La app presenta; el gateway infiere.” | No aparece `joblib.load` en `app.py`. |
-| 115–120 | Intercambio | “Prueba una entrada inválida en la app de otra pareja.” | Aceptación y debrief. |
+| 0–10 | Comparar diffs S5/S6 | “Busca lo nuevo, no rehagas lo existente.” | Identifican `session`, controller y políticas. |
+| 10–25 | Estado de sesión | “`setdefault` protege la sesión.” | Inicialización idempotente y limpieza parcial. |
+| 25–40 | Caché de recurso | “Cachea el gateway, no la petición.” | El bundle no se carga por cada rerun. |
+| 40–60 | Presentación | “Una etiqueta técnica no es una decisión.” | Confianza/latencia pasan límites. |
+| 60–85 | Controlador | “El callback observa `loading`.” | Secuencias `loading → success/error`. |
+| 85–105 | App avanzada | “Conecta el formulario de S5 al estado.” | Resultado, retry y clear funcionan. |
+| 105–115 | Revisión entre parejas | “Busca payloads en la telemetría.” | No se filtran features. |
+| 115–120 | Debrief | “¿Qué cambiaría en S7?” | El gateway queda reemplazable por HTTP. |
 
-## Pistas graduadas
+## Evidencias obligatorias
 
-1. **Confianza:** usa una política explícita y prueba los límites, no compares
-   strings de forma dispersa.
-2. **Errores:** asigna el código antes de construir el texto; el código sirve a
-   la telemetría y el texto a la persona.
-3. **Estados:** el callback de emisión permite observar `loading` sin acoplar el
-   controlador a Streamlit.
-4. **Gateway empaquetado:** construye `WineQualityRequest` y llama a
-   `infer_wine_quality()` de S4; no copies el preprocesado.
-
-## Criterios de aceptación
-
-```bash
-uv run pytest
-uv run ruff check src tests
-uv run ruff format --check src tests
-```
-
-La app es aceptada si una persona puede distinguir idle/loading/success/error,
-entender qué hacer ante un fallo y ver versión, confianza y latencia sin que la
-interfaz exponga detalles internos o datos del formulario.
+- diff o nota que identifique qué se conserva de S5;
+- captura de carga, éxito, error y reintento;
+- prueba de que el resultado sobrevive a un rerun;
+- prueba de que limpiar no borra telemetría;
+- tests y lint verdes;
+- explicación de qué se cachea y por qué.

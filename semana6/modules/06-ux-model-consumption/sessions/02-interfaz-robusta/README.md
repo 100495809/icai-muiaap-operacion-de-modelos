@@ -1,61 +1,58 @@
-# Clase 2 — Taller: interfaz robusta de inferencia
+# Clase 2 — Taller: evolucionar la app de S5
 
 **Duración:** 2 horas de práctica
 
-## Resultado de aprendizaje
+La pareja trabaja sobre un snapshot del proyecto de S5. El formulario básico ya
+está presente; el trabajo consiste en convertir su ejecución implícita en una
+experiencia con estado explícito y recursos reutilizables.
 
-La pareja implementa una interfaz de consumo separando presentación, estado,
-telemetría y gateway de inferencia. La solución comunica errores sin detalles
-internos, muestra confianza y latencia, conserva las versiones del bundle y
-queda preparada para sustituir el gateway local por HTTP en S7.
+## Qué viene de S5
 
-## Punto de partida
+- `FEATURE_FIELDS` y los once nombres del contrato;
+- `st.form` y los widgets de entrada;
+- selección de `DemoGateway` o bundle de S4;
+- presentación básica de categoría, confianza y versiones.
 
-El starter de la práctica 02 ya contiene:
+## Qué se implementa en S6
 
-- los nombres de las once características de S3;
-- la forma de salida de S3/S4;
-- un `DemoGateway` para probar la UX sin descargar un modelo;
-- el esqueleto de una app Streamlit;
-- pruebas públicas de controlador, vista, errores y telemetría.
+- inicialización idempotente de `st.session_state`;
+- carga cacheada del gateway mediante `st.cache_resource`;
+- controlador independiente de Streamlit;
+- transiciones `loading → success/error`;
+- reintento y limpieza del último resultado;
+- copy de confianza y latencia;
+- errores accionables con `request_id`;
+- telemetría agregada.
 
-La pareja completa `presentation.py` y `controller.py`, y conecta esos
-componentes en `app.py`. No debe copiar la carga del `joblib` ni el
-preprocesado: el modo empaquetado delega en S4.
+## Secuencia
 
-## Secuencia del taller — 120 minutos
-
-| Minutos | Hito | Trabajo de las parejas | Comprobación |
+| Minutos | Hito | Pista | Comprobación |
 | ---: | --- | --- | --- |
-| 0–10 | Leer el contrato | Ejecutan la suite roja y leen los nombres de los tests. | Identifican los cuatro seams públicos. |
-| 10–30 | Estados y confianza | Implementan `build_prediction_view()` y las políticas de confianza/latencia. | 0.42 pide revisión; 0.74 es orientativa; 0.93 no se presenta como garantía. |
-| 30–55 | Errores accionables | Implementan `to_user_facing_error()` y conservan `request_id`. | No se muestra traceback ni payload. |
-| 55–85 | Controlador | Implementan `PredictionController.submit()` y emiten `loading` antes del resultado. | Se observan `loading → success` y `loading → error`. |
-| 85–105 | Telemetría | Registran agregados de éxito, error y latencia. | El snapshot no contiene valores de las once features. |
-| 105–115 | Streamlit | Conectan formulario, gateway y renderizado. | La UI solo orquesta; no contiene `predict` ni `joblib.load`. |
-| 115–120 | Debrief | Intercambian la app y revisan estados y mensajes. | `pytest`, Ruff y criterios de aceptación pasan. |
+| 0–10 | Comparar S5 y starter S6 | “El formulario ya está hecho.” | Localizan solo las nuevas fronteras. |
+| 10–25 | Estado de sesión | “Inicializa sin sobrescribir.” | La predicción sobrevive a un rerun. |
+| 25–40 | Caché | “El recurso se carga, los datos no se confunden.” | El gateway no se reconstruye innecesariamente. |
+| 40–65 | Políticas y presentación | “Confianza y latencia son señales distintas.” | Límites y copy pasan los tests. |
+| 65–90 | Controlador | “Emite `loading` antes del gateway.” | Se observan transiciones y request ID. |
+| 90–110 | Renderizado avanzado | “Usa un placeholder o `st.status`.” | La app comunica carga, éxito y error. |
+| 110–120 | Reintento y debrief | “No borres telemetría al limpiar.” | Aceptación de sesión completa. |
 
-## Comandos de aceptación
+## Criterios de aceptación
 
-Desde una copia del starter:
+Después de completar los `TODO` del starter:
 
 ```bash
-uv sync
 uv run pytest
 uv run ruff check src tests
 uv run ruff format --check src tests
 ```
 
-Para ejecutar la app, instala Streamlit como dependencia opcional del proyecto
-de la semana y lanza `app.py`. Durante la clase puede usarse el gateway demo;
-para el bundle real, define `MODEL_UI_BUNDLE` con el directorio de S4.
+Además, la demo debe mostrar:
 
-## Debrief
-
-Preguntas de cierre:
-
-1. ¿Qué tendría que cambiar para que el gateway llamase a una API REST?
-2. ¿Qué diferencia hay entre una confianza alta y una decisión autorizada?
-3. ¿Qué métrica de latencia registrarías en producción además de la media?
-4. ¿Qué datos de la interacción no deben llegar a MLflow ni a la telemetría de
-   esta UI?
+- un resultado que permanece tras un rerun;
+- gateway cargado mediante caché de recurso;
+- estado de carga visible;
+- error de entrada y error de bundle con recuperación;
+- confianza baja sin lenguaje de garantía;
+- latencia alta como `success` lento, no como error de contrato;
+- botón de reintento y botón de limpiar;
+- telemetría sin valores del formulario.

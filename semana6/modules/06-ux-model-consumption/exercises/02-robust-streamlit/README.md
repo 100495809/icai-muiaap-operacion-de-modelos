@@ -1,37 +1,42 @@
-# Práctica 02 — Interfaz Streamlit robusta
+# Práctica 02 — Evolucionar la app Streamlit de S5
 
-Esta práctica convierte la matriz UX de la clase 1 en un componente reutilizable
-y probado. El alumnado trabaja únicamente en
-`problem/starter/`; la solución docente está en `solutions/02-robust-streamlit/`.
+Esta práctica recibe la primera interfaz de S5 y la refactoriza para soportar
+el modelo de ejecución avanzado de Streamlit. El formulario básico no es el
+trabajo nuevo: ya está implementado en el snapshot del starter.
 
 ## Objetivo
 
-Implementar una frontera de consumo que:
+Implementar:
 
-- emita `loading` antes de pedir una predicción;
-- clasifique la confianza con una política explícita;
-- muestre la latencia como señal técnica separada del resultado;
-- traduzca fallos técnicos a mensajes accionables;
-- conserve `model_version`, `preprocessing_version` y `request_id`;
-- registre solo métricas agregadas;
-- permita cambiar el gateway local por un cliente HTTP en S7.
+- `st.session_state` inicializado de forma idempotente;
+- `st.cache_resource` para el gateway/bundle;
+- máquina de estados `idle/loading/success/error`;
+- presentación de confianza y latencia;
+- errores con código, recuperación y `request_id`;
+- retry y clear;
+- telemetría sin payloads.
 
-## Antes de empezar
+## Punto de partida
 
-1. Lee el [contrato UX de la práctica 01](../01-ui-contract/problem/README.md).
-2. Ejecuta la suite roja en `starter/`.
-3. Inspecciona el protocolo `InferenceGateway` y el `DemoGateway`.
-4. No implementes una nueva función de `predict` ni cargues el `joblib` desde
-   Streamlit.
+El starter conserva de S5:
+
+- `FEATURE_FIELDS`;
+- `collect_values()`;
+- el `DemoGateway`;
+- el adaptador del bundle de S4;
+- la presentación mínima del formulario.
+
+El alumno implementa los componentes avanzados de `session.py`,
+`policies.py`, `presentation.py`, `controller.py` y el cableado avanzado de
+`app.py`.
 
 ## Orden recomendado
 
-1. `presentation.py`: niveles de confianza, latencia y copy seguro.
-2. `errors.py` y `presentation.py`: errores estables, recuperación y
-   `request_id`.
-3. `controller.py`: transición `loading → success/error`, medición y
-   telemetría.
-4. `app.py`: formulario, spinner, renderizado y gateway.
+1. `session.py`: inicialización y limpieza sin perder telemetría;
+2. `policies.py`: límites de confianza y latencia;
+3. `presentation.py`: view model y errores accionables;
+4. `controller.py`: emitir, medir, validar y registrar;
+5. `app.py`: caché, session state, render, retry y clear.
 
 ## Comandos
 
@@ -41,22 +46,15 @@ uv sync
 uv run pytest
 uv run ruff check src tests
 uv run ruff format --check src tests
-```
-
-La app puede ejecutarse con Streamlit como extensión:
-
-```bash
 uv run --with 'streamlit>=1.40,<2.0' streamlit run app.py
 ```
 
-Sin `MODEL_UI_BUNDLE`, la app usa `DemoGateway`, que permite probar la UX sin
-artefacto binario. Con `MODEL_UI_BUNDLE=/ruta/al/wine_quality_bundle`, el
-gateway empaquetado delega la carga y la inferencia en el módulo de S4.
+## Evidencia
 
-## Evidencia que se entrega
-
-- tests verdes;
-- captura de resultado normal y confianza baja;
-- captura de error de contrato con acción de recuperación;
-- versión de modelo/preprocesado y latencia visibles;
+- diff que muestre qué código de S5 se conserva;
+- resultado que sobrevive a un rerun;
+- gateway cargado con `st.cache_resource`;
+- estados de carga, éxito y error visibles;
+- reintento y limpieza funcionando;
+- confianza baja y latencia alta comunicadas correctamente;
 - snapshot de telemetría sin valores de las features.

@@ -1,4 +1,4 @@
-"""Adaptador Streamlit para el controlador de UX de la semana 6."""
+"""Solución S6: evolución avanzada de la app Streamlit de S5."""
 
 from __future__ import annotations
 
@@ -9,12 +9,19 @@ from typing import Any
 from model_ui.contracts import UiState
 from model_ui.controller import PredictionController
 from model_ui.gateway import (
+    FEATURE_NAMES,
     DemoGateway,
     InferenceGateway,
     PackagedBundleGateway,
     UnavailableGateway,
 )
-from model_ui.telemetry import Telemetry
+from model_ui.session import (
+    LAST_STATE_KEY,
+    LAST_VALUES_KEY,
+    TELEMETRY_KEY,
+    clear_last_state,
+    initialize_session_state,
+)
 
 FEATURE_FIELDS = (
     ("fixed_acidity", "Fixed acidity", 0.0, 20.0, 7.4),
@@ -30,25 +37,26 @@ FEATURE_FIELDS = (
     ("alcohol", "Alcohol", 5.0, 20.0, 9.4),
 )
 
+assert tuple(field[0] for field in FEATURE_FIELDS) == FEATURE_NAMES
 
-def build_gateway() -> InferenceGateway:
-    """Elige bundle real si está configurado y demo en otro caso."""
 
-    bundle_value = os.getenv("MODEL_UI_BUNDLE")
+def build_gateway(bundle_value: str | None) -> InferenceGateway:
+    """Selecciona el bundle configurado o conserva el gateway demo de S5."""
+
     if not bundle_value:
         return DemoGateway()
     try:
         return PackagedBundleGateway.from_bundle_path(Path(bundle_value))
-    except Exception as error:  # noqa: BLE001 - se traduce en la UI
+    except Exception as error:  # noqa: BLE001 - se convierte en estado visible
         return UnavailableGateway(str(error))
 
 
 def collect_values(st: Any) -> tuple[bool, dict[str, float]]:
-    """Dibuja el formulario sin conocer la implementación del modelo."""
+    """Conserva el formulario básico de S5 sin duplicar la inferencia."""
 
     values: dict[str, float] = {}
     with st.form("wine_quality_form"):
-        st.caption("Caso didáctico: la salida es orientativa y no es una garantía.")
+        st.caption("Formulario de S5: la inferencia se envía al pulsar el botón.")
         columns = st.columns(2)
         for index, (name, label, minimum, maximum, default) in enumerate(
             FEATURE_FIELDS
@@ -65,37 +73,51 @@ def collect_values(st: Any) -> tuple[bool, dict[str, float]]:
     return submitted, values
 
 
-def render_state(st: Any, state: UiState) -> None:
-    """Renderiza solo estados y view models, nunca excepciones internas."""
+def get_cached_gateway(st: Any, bundle_value: str | None) -> InferenceGateway:
+    """Cachea el recurso de inferencia, no los datos de una petición."""
 
+    @st.cache_resource(show_spinner=False)
+    def cached_gateway(configured_bundle: str | None) -> InferenceGateway:
+        return build_gateway(configured_bundle)
+
+    return cached_gateway(bundle_value)
+
+
+def render_state(st: Any, state: UiState, target: Any | None = None) -> None:
+    """Renderiza un `UiState` en la pantalla o en un placeholder."""
+
+    output = target or st
+    if state.phase == "idle":
+        output.info("Completa el formulario y pulsa “Ejecutar inferencia”.")
+        return
     if state.phase == "loading":
-        st.info("Validando la muestra y ejecutando el modelo…")
+        output.info("Validando la muestra y ejecutando el modelo…")
         return
     if state.phase == "error" and state.error:
-        st.error(state.error.title)
-        st.write(state.error.message)
-        st.info(state.error.recovery)
-        st.caption(f"Request ID: {state.error.request_id}")
+        output.error(state.error.title)
+        output.write(state.error.message)
+        output.info(state.error.recovery)
+        output.caption(f"Request ID: {state.error.request_id}")
         return
     if state.phase != "success" or state.view is None:
         return
 
     view = state.view
-    st.success(view.quality_label)
-    metric_columns = st.columns(3)
-    metric_columns[0].metric("Confianza", f"{view.confidence:.0%}")
-    metric_columns[1].metric("Latencia", f"{view.latency_ms:.1f} ms")
-    metric_columns[2].metric("Nivel", view.confidence_label)
+    output.success(view.quality_label)
+    columns = output.columns(3)
+    columns[0].metric("Confianza", f"{view.confidence:.0%}")
+    columns[1].metric("Latencia", f"{view.latency_ms:.1f} ms")
+    columns[2].metric("Nivel", view.confidence_label)
     if view.confidence_level == "low":
-        st.warning(view.confidence_message)
+        output.warning(view.confidence_message)
     else:
-        st.info(view.confidence_message)
+        output.info(view.confidence_message)
     if view.latency_status == "above_target":
-        st.warning(view.latency_message)
+        output.warning(view.latency_message)
     else:
-        st.caption(view.latency_message)
-    with st.expander("Trazabilidad del resultado"):
-        st.write(
+        output.caption(view.latency_message)
+    with output.expander("Trazabilidad"):
+        output.write(
             {
                 "model_version": view.model_version,
                 "preprocessing_version": view.preprocessing_version,
@@ -105,7 +127,7 @@ def render_state(st: Any, state: UiState) -> None:
 
 
 def main() -> None:
-    """Construye la pantalla y conserva el controlador entre reruns."""
+    """Conserva el formulario de S5 y controla su ciclo de vida en S6."""
 
     try:
         import streamlit as st
@@ -114,32 +136,52 @@ def main() -> None:
             "Instala la app con `uv sync --extra app` para ejecutar Streamlit."
         ) from error
 
-    st.set_page_config(page_title="Wine Quality · Operación de Modelos", page_icon="🍷")
+    st.set_page_config(page_title="Wine Quality · S6", page_icon="🍷")
     st.title("Inferencia de calidad de vino")
-    st.write(
-        "Demo de UX para IA: contrato, estado, confianza, latencia y trazabilidad."
-    )
+    st.caption("S6: la app de S5 ahora conserva estado y comunica la operación.")
 
-    if "telemetry" not in st.session_state:
-        st.session_state["telemetry"] = Telemetry()
-    if "gateway" not in st.session_state:
-        st.session_state["gateway"] = build_gateway()
-    if "last_state" not in st.session_state:
-        st.session_state["last_state"] = UiState(phase="idle")
-
-    gateway = st.session_state["gateway"]
-    telemetry = st.session_state["telemetry"]
+    initialize_session_state(st.session_state)
+    bundle_value = os.getenv("MODEL_UI_BUNDLE")
+    gateway = get_cached_gateway(st, bundle_value)
+    telemetry = st.session_state[TELEMETRY_KEY]
     controller = PredictionController(gateway, telemetry=telemetry)
-    submitted, values = collect_values(st)
-    if submitted:
-        with st.spinner("Ejecutando inferencia…"):
-            st.session_state["last_state"] = controller.submit(values)
 
-    render_state(st, st.session_state["last_state"])
+    submitted, values = collect_values(st)
+    state_slot = st.empty()
+    if submitted:
+        st.session_state[LAST_VALUES_KEY] = values
+        with st.status("Ejecutando inferencia…", expanded=False) as status:
+            state = controller.submit(
+                values,
+                emit=lambda event: render_state(st, event, state_slot),
+            )
+            st.session_state[LAST_STATE_KEY] = state
+            status.update(
+                label=(
+                    "Inferencia completada"
+                    if state.phase == "success"
+                    else "La inferencia necesita atención"
+                ),
+                state="complete" if state.phase == "success" else "error",
+            )
+
+    if st.button("Limpiar último resultado"):
+        clear_last_state(st.session_state)
+        st.rerun()
+
+    state = st.session_state[LAST_STATE_KEY]
+    render_state(st, state)
+    if state.phase == "error" and st.session_state[LAST_VALUES_KEY]:
+        if st.button("Reintentar"):
+            retry_state = controller.submit(st.session_state[LAST_VALUES_KEY])
+            st.session_state[LAST_STATE_KEY] = retry_state
+            st.rerun()
+
     st.divider()
     st.subheader("Telemetría de la sesión")
-    st.json(telemetry.snapshot().__dict__)
-    st.caption("Solo se muestran agregados; no se guardan los valores del formulario.")
+    telemetry_snapshot = telemetry.snapshot()
+    st.json(telemetry_snapshot.__dict__)
+    st.caption("Solo se muestran agregados; no se guardan las features en Telemetry.")
 
 
 if __name__ == "__main__":

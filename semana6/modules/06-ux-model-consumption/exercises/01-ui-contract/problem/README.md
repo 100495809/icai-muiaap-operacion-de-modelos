@@ -1,59 +1,58 @@
-# Práctica 01 — Diseñar el contrato UX de la inferencia
+# Práctica 01 — Analizar y diseñar el estado de la app de S5
 
 **Modalidad:** parejas · **Duración:** 45–60 minutos
 
 ## Objetivo
 
-Diseñar antes de programar la experiencia que consumirá el bundle de S4. La
-pareja debe convertir los riesgos de S1 y los contratos de S3/S4 en estados,
-mensajes y criterios observables.
+Partir de la app básica de S5 y decidir qué debe persistir entre reruns, qué
+evento provoca cada transición y qué debe ver la persona mientras se sirve una
+predicción.
 
-## Material de partida
+No rediseñéis el formulario de S5. El trabajo es especificar su evolución.
 
-- [Notebook del alumnado](01-ux-y-estados-alumno.ipynb).
-- [Manifiesto de ejemplo de S4](../../../../../../semana4/assets/04-model-packaging/manifest_example.json).
-- La salida de S3/S4: `quality_band`, `confidence`, `model_version` y
-  `preprocessing_version`.
+## Material
+
+- [Notebook del alumnado](01-estado-streamlit-alumno.ipynb).
+- Vuestra app de S5 o la [solución base de S5](../../../../../../semana5/modules/05-streamlit-basic-model-ui/solutions/02-first-streamlit/README.md).
+- Contrato de salida y manifiesto de [S4](../../../../../../semana4/assets/04-model-packaging/manifest_example.json).
 
 ## Entrega
 
-Completad el notebook o una tabla equivalente con:
+### 1. Estado de sesión
 
-| Caso | Estado | Qué ve la persona | Acción | Evidencia técnica |
+Completad una tabla:
+
+| Clave | Tipo | Se conserva entre reruns | Se puede limpiar | Por qué |
 | --- | --- | --- | --- | --- |
-| Pantalla inicial | `idle` | Formulario y alcance didáctico | Completar campos | Ninguna petición enviada |
-| Petición en curso | `loading` | Progreso y control deshabilitado | Esperar o cancelar | Inicio de latencia |
-| Resultado con confianza baja | `success` | Resultado orientativo y aviso de revisión | Revisar, no concluir | Confianza y versiones |
-| Campo inválido | `error` | Qué corregir | Modificar entrada | Código estable y `request_id` |
-| Bundle no disponible | `error` | Servicio no disponible | Avisar al responsable | Error sin traceback |
-| Respuesta lenta | `success` | Resultado + señal técnica de latencia | Revisar operación | Latencia agregada |
+| `last_state` | TODO | TODO | TODO | TODO |
+| `telemetry` | TODO | TODO | TODO | TODO |
+| valores completos del formulario | TODO | TODO | TODO | TODO |
 
-Una respuesta lenta no se convierte automáticamente en un error: si la salida
-cumple el contrato, conserva `success` y añade la señal
-`latency_status=above_target`. Los errores (`invalid_input`,
-`artifact_unavailable`, `timeout` y `prediction_error`) tienen un código y una
-recuperación distintos.
+### 2. Máquina de estados
 
-Además, entregad:
+| Estado | Evento de entrada | Qué se muestra | Acción permitida | Evidencia |
+| --- | --- | --- | --- | --- |
+| `idle` | Inicio/limpiar | TODO | TODO | TODO |
+| `loading` | Enviar formulario | TODO | TODO | TODO |
+| `success` | Payload válido | TODO | TODO | TODO |
+| `error` | Excepción controlada | TODO | TODO | TODO |
 
-1. umbrales justificados para confianza baja/media/alta;
-2. tres frases que la interfaz no debe mostrar, por ejemplo “garantizado”;
-3. tres criterios de aceptación verificables;
-4. un ejemplo de dato que nunca debe entrar en la telemetría.
+Una respuesta con salida válida pero latencia superior a 300 ms permanece en
+`success` y añade una señal técnica de lentitud.
 
-## Pistas
+### 3. Caché y UX
 
-- No confundas `confidence` con probabilidad de que una decisión humana sea
-  correcta.
-- `model_version` y `preprocessing_version` ayudan a investigar un resultado,
-  pero no son instrucciones para la persona usuaria.
-- El mensaje de error debe decir qué hacer después; el detalle técnico queda
-  en logs controlados, no en la pantalla.
-- Diseña la transición `loading → error` aunque la excepción ocurra antes de
-  llamar al modelo.
+Justificad:
 
-## Comprobación
+- qué función se protege con `st.cache_resource`;
+- qué dato no debe cachearse como recurso;
+- qué mensaje se muestra con confianza baja;
+- qué recuperación se ofrece para bundle ausente, timeout y error de entrada.
 
-La tabla debe permitir que otra pareja implemente la clase 2 sin inventar
-estados, textos ni umbrales. La solución orientativa está en
-[`solution/readme.md`](../solution/readme.md).
+## Criterios de aceptación
+
+- el diseño parte explícitamente de una limitación de S5;
+- no introduce una segunda definición del contrato de S4;
+- las transiciones tienen eventos y acciones observables;
+- distingue estado de sesión, recurso cacheado y datos de una petición;
+- otra pareja puede implementar el taller sin inventar estados.

@@ -1,14 +1,16 @@
-# Starter — Interfaz de consumo robusta
+# Starter — Refactor avanzado de la app de S5
 
-Este es el único proyecto de código que recibe el alumnado. Los TODO están en
-`presentation.py`, `controller.py` y `app.py`; el gateway demo, los contratos
-de UX y las pruebas base están preparados para que el taller se concentre en
-estados, mensajes y observabilidad.
+Este starter es un snapshot de la primera interfaz de S5. El formulario y el
+gateway básico ya están preparados; no los vuelvas a implementar.
 
-Implementa los TODO siguiendo el orden de la
-[práctica](../../README.md). Las pruebas describen el comportamiento público; no
-comprueban detalles internos.
+Los `TODO` del trabajo avanzado están en:
 
-El `DemoGateway` devuelve una predicción determinista y no representa un modelo
-clínico ni una garantía de calidad. El modo real reutiliza el bundle validado de
-S4 mediante `PackagedBundleGateway`.
+- `src/model_ui/session.py`;
+- `src/model_ui/policies.py`;
+- `src/model_ui/presentation.py`;
+- `src/model_ui/controller.py`;
+- `app.py`, para caché y renderizado de estados.
+
+Las pruebas describen las transiciones y los contratos públicos. La app debe
+conservar el comportamiento de S5 y añadir estado, reintento, limpieza y
+telemetría.
