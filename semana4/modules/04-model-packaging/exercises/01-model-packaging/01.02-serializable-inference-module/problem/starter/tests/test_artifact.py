@@ -98,7 +98,8 @@ def test_inference_rejects_an_unknown_model_label() -> None:
         manifest=create_manifest(estimator, "bad-output-v1"),
     )
 
-    with pytest.raises(ValueError):
+    # Se comprueba también que el mensaje explique que la etiqueta de salida es desconocida
+    with pytest.raises(ValueError, match="Etiqueta de salida desconocida"):
         infer_wine_quality(bundle, make_request())
 
 

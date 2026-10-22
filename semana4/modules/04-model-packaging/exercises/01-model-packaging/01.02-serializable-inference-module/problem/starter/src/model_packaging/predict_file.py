@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import csv
 from pathlib import Path
 
-from model_packaging.artifact import DEFAULT_BUNDLE_PATH
+from model_packaging.artifact import (
+    DEFAULT_BUNDLE_PATH,
+    infer_wine_quality,
+    load_model_bundle,
+)
+from model_packaging.contracts import WineQualityRequest
 
 
 def predict_file(
@@ -13,10 +19,35 @@ def predict_file(
     output_path: Path,
     bundle_path: Path,
 ) -> int:
-    """TODO: valida todas las filas y escribe el CSV solo al final."""
+    """Predice todas las filas de un CSV y guarda sus resultados."""
 
-    raise NotImplementedError("Implementa predict_file().")
+    bundle = load_model_bundle(bundle_path)
+    filas = []
 
+    with input_path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            sample_id = row.pop("sample_id", "")
+            if sample_id == "":
+                raise ValueError("Hay una fila con sample_id vacío.")
+            try:
+                request = WineQualityRequest.model_validate(row)
+            except Exception as e:
+                raise ValueError(f"Fila con sample_id {sample_id} no válida: {e}")
+
+            prediction = infer_wine_quality(bundle, request)
+            output_row = prediction.model_dump(mode="json")
+            output_row["sample_id"] = sample_id
+            filas.append(output_row)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=filas[0].keys())
+        writer.writeheader()
+        writer.writerows(filas)
+
+    return len(filas)
+    
 
 def parse_args() -> argparse.Namespace:
     """Declara la interfaz del comando público."""
