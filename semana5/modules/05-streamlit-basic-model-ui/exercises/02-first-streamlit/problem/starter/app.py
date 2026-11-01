@@ -45,18 +45,47 @@ def collect_values(st: Any) -> tuple[bool, dict[str, float]]:
     Cada ``number_input`` debe recibir label, rango, default, step y una key
     estable. Devuelve ``(submitted, values)`` sin llamar al gateway.
     """
+    values = {}
+    with st.form("wine_quality_form"):
+        for field in FIELD_SPECS:
+            values[field.name] = st.number_input(
+                label=field.label,
+                min_value=field.min_value,
+                max_value=field.max_value,
+                value=field.default,
+                step=field.step,
+                key=f"input_{field.name}",
+            )
 
-    raise NotImplementedError(
-        f"TODO: renderiza los {len(FIELD_SPECS)} campos de FIELD_SPECS"
-    )
+        submitted = st.form_submit_button("Ejecutar inferencia")
+
+
+    # values = {
+    #     "fixed_acidity": fixed_acidity,
+    #     "volatile_acidity": volatile_acidity,
+    #     "citric_acid": citric_acid,
+    #     "residual_sugar": residual_sugar,
+    #     "chlorides": chlorides,
+    #     "free_sulfur_dioxide": free_sulfur_dioxide,
+    #     "total_sulfur_dioxide": total_sulfur_dioxide,
+    #     "density": density,
+    #     "ph": ph,
+    #     "sulphates": sulphates,
+    #     "alcohol": alcohol
+    # }
+
+
+    return submitted, values
 
 
 def render_prediction(st: Any, prediction: PredictionPayload) -> None:
     """TODO: presenta los cuatro campos de ``PredictionPayload``."""
 
-    raise NotImplementedError(
-        "TODO: presenta quality_band, confidence y las dos versiones"
-    )
+    st.success("Inferencia completada con éxito.")
+    st.write(f"**quality_band:** {prediction.quality_band}")
+    st.write(f"**confidence:** {prediction.confidence}")
+    st.write(f"**model_version:** {prediction.model_version}")
+    st.write(f"**preprocessing_version:** {prediction.preprocessing_version}")
 
 
 def run_app(st: Any, gateway: InferenceGateway) -> None:
