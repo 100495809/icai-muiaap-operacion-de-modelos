@@ -1,7 +1,7 @@
 """Punto de entrada de la API (YA HECHO). Arranque: uvicorn app.main:app --port 8000"""
 from fastapi import FastAPI
 
-from app.routers import chat, health, predict
+from app.routers import health, chat, predict
 
 app = FastAPI(title="Practica 8 - Chatbot de riesgo")
 

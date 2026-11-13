@@ -14,5 +14,31 @@ VARIABLES = [
 ]
 
 # TODO: cargar el modelo joblib una sola vez, al importar el modulo
+MODEL = joblib.load(MODEL_PATH)
+
 # TODO: funcion decidir(probabilidad) -> "aprobar", "revisar" o "rechazar" (umbrales en el enunciado)
+def decidir(probabilidad)-> str:
+    if probabilidad < 0.2:
+        return "aprobar"
+    elif probabilidad < 0.5:
+        return "revisar"
+    else:
+        return "rechazar"
+
 # TODO: funcion predecir(entrada) -> PrediccionSalida, usando VARIABLES para ordenar los valores
+
+def predecir(entrada) -> PrediccionSalida:
+
+    datos = entrada.model_dump()
+    for var in VARIABLES:
+        if var not in datos:
+            raise ValueError(f"Falta la variable {var} en la entrada")
+        valores = []
+        for var in VARIABLES:
+            if var in datos:
+                valores.append(datos[var])
+
+    probabilidad_impago = MODEL.predict_proba([valores])[0][1]
+
+    decision = decidir(probabilidad_impago)
+    return PrediccionSalida(probabilidad_impago=probabilidad_impago, decision=decision)

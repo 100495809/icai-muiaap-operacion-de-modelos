@@ -28,6 +28,66 @@ def leer_argumentos(texto):
 
 
 # TODO: definir_tool() -> dict con la definicion de la tool, sacando "parameters" de PrestamoEntrada
+def definir_tool() -> dict:
+    return {
+        "type": "function",
+        "function":{"name": NOMBRE_TOOL, "description": "Calcula el riesgo de impago de un préstamo.", "parameters": PrestamoEntrada.model_json_schema()}}
+
 # TODO: ejecutar_tool(nombre, argumentos_json) -> dict con "ok" True/False
 #       (tool desconocida, JSON roto, datos invalidos o campos inventados -> ok False con el error)
+def ejecutar_tool(nombre, argumentos_json) -> dict:
+    if nombre != NOMBRE_TOOL:
+        return {"ok": False, "error": f"Herrameinta desconocida: {nombre}"}
+    argumentos = leer_argumentos(argumentos_json)
+    try:
+        entrada = PrestamoEntrada.model_validate(argumentos)
+    except ValidationError as e:
+        return {"ok": False, "error": f"Datos invalidos: {e}"}
+    prediccion = predecir(entrada)
+    return {
+        "ok": True,
+        "probabilidad_impago": prediccion.probabilidad_impago,
+        "decision": prediccion.decision,
+    }
+
 # TODO: responder(mensajes, llm) -> ChatSalida, con el bucle LLM -> tool -> LLM (maximo MAX_VUELTAS)
+def responder(mensajes, llm) -> ChatSalida:
+    historial = [{"role": "system", "content": SISTEMA}]
+    for m in mensajes:
+        historial.append({"role": m.role, "content": m.content})
+
+    herramienta_usada = None
+    tools = [definir_tool()]
+
+    for _ in range(MAX_VUELTAS):
+        respuesta = llm.completar(historial, tools)
+        historial.append(respuesta)
+
+        tool_calls = respuesta.get("tool_calls")
+        if tool_calls:
+            for call in tool_calls:
+                func = call["function"]
+                nombre = func["name"]
+                args_str = func["arguments"]
+
+                resultado = ejecutar_tool(nombre, args_str)
+                herramienta_usada = HerramientaUsada(
+                    nombre=nombre,
+                    argumentos=leer_argumentos(args_str),
+                    resultado=resultado,
+                )
+                historial.append({
+                    "role": "tool",
+                    "tool_call_id": call.get("id"),
+                    "content": json.dumps(resultado),
+                })
+        else:
+            return ChatSalida(
+                respuesta=respuesta.get("content") or "",
+                herramienta=herramienta_usada,
+            )
+
+    return ChatSalida(
+        respuesta="No se ha podido procesar la solicitud tras varios intentos.",
+        herramienta=herramienta_usada,
+    )
