@@ -77,3 +77,14 @@ uv run ruff format --check .
 - `responses=` y `openapi_examples=`: FastAPI, «Additional Responses in
   OpenAPI» y «Declare Request Example Data».
 - `app.dependency_overrides`: FastAPI, «Testing Dependencies with Overrides».
+
+---
+
+## Nota de compatibilidad
+
+- **Cambio compatible (pasamos de 1.0.0 a 1.1.0)**:
+  Se ha añadido el campo `served_at` en la respuesta. Esto no rompe a los clientes que ya usaban la API porque si no les interesa ese campo nuevo, lo ignoran y su código funciona igual.
+
+- **Cambios que romperían a los clientes (y obligarían a poner versión 2.0.0)**:
+  Rompería si cambiásemos el nombre de campos que ya existían (como `quality_band`), si quitásemos la confianza, o si pidiéramos campos obligatorios nuevos al mandar los datos del vino, porque entonces las peticiones que antes funcionaban empezarían a fallar.
+
