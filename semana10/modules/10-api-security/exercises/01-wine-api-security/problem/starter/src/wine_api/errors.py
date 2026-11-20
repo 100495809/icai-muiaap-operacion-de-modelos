@@ -1,8 +1,8 @@
 """Errores de dominio y su traducción a un único sobre HTTP."""
 
 import logging
-from collections.abc import Sequence
-from typing import Any
+from collections.abc import Mapping, Sequence
+from typing import Any, ClassVar
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -26,6 +26,7 @@ class WineApiError(Exception):
     status_code = 500
     code = ErrorCode.INTERNAL_ERROR
     message = "Unexpected server error"
+    default_headers: ClassVar[Mapping[str, str]] = {}
 
     # TODO S10.2b: algunos errores necesitan cabeceras propias: el 401 lleva
     # `WWW-Authenticate: ApiKey` y el 429 lleva `Retry-After`, cuyo valor
@@ -35,6 +36,9 @@ class WineApiError(Exception):
     # `error_response` y que esta las copie SIN perder `X-Request-Id`.
     # `ModelUnavailableError()` debe seguir funcionando sin argumentos.
     # Comprobación: tests/test_s10_2_authentication.py (WWW-Authenticate).
+    def __init__(self, headers: Mapping[str, str] | None = None) -> None:
+        super().__init__(self.message)
+        self.headers = {**self.default_headers, **(headers or {})}
 
 
 class ModelUnavailableError(WineApiError):
@@ -52,6 +56,38 @@ class ModelUnavailableError(WineApiError):
 # TODO S10.4a: crea `RateLimitExceededError` (429, `ErrorCode.RATE_LIMITED`).
 # Recibe los segundos de espera y produce `Retry-After` (entero, en segundos)
 # y, si quieres, `X-RateLimit-Limit` y `X-RateLimit-Remaining: 0`.
+class AuthenticationError(WineApiError):
+    """Falta la API key o no corresponde a ningún cliente: no decimos cuál."""
+
+    status_code = 401
+    code = ErrorCode.UNAUTHORIZED
+    message = "Missing or invalid API key"
+    default_headers = {"WWW-Authenticate": "ApiKey"}
+
+
+class PermissionDeniedError(WineApiError):
+    """El cliente está autenticado, pero su clave no tiene el scope necesario."""
+
+    status_code = 403
+    code = ErrorCode.FORBIDDEN
+    message = "The API key does not grant access to this operation"
+
+
+class RateLimitExceededError(WineApiError):
+    """El cliente ha agotado su cuota en la ventana actual."""
+
+    status_code = 429
+    code = ErrorCode.RATE_LIMITED
+    message = "Rate limit exceeded; retry after the indicated seconds"
+
+    def __init__(self, retry_after: int, limit: int) -> None:
+        super().__init__(
+            headers={
+                "Retry-After": str(retry_after),
+                "X-RateLimit-Limit": str(limit),
+                "X-RateLimit-Remaining": "0",
+            }
+        )
 
 
 def error_response(
@@ -60,6 +96,7 @@ def error_response(
     code: ErrorCode,
     message: str,
     fields: list[FieldError] | None = None,
+    headers: Mapping[str, str] | None = None,
 ) -> JSONResponse:
     """Construye el sobre de error; `fields` desaparece si no aplica."""
 
@@ -71,7 +108,7 @@ def error_response(
     return JSONResponse(
         status_code=status_code,
         content=body.model_dump(mode="json", exclude_none=True),
-        headers={REQUEST_ID_HEADER: request_id},
+        headers={**(headers or {}), REQUEST_ID_HEADER: request_id},
     )
 
 
@@ -104,7 +141,9 @@ async def handle_validation_error(
 
 
 async def handle_api_error(request: Request, exc: WineApiError) -> JSONResponse:
-    return error_response(request, exc.status_code, exc.code, exc.message)
+    return error_response(
+        request, exc.status_code, exc.code, exc.message, headers=exc.headers
+    )
 
 
 async def handle_http_exception(

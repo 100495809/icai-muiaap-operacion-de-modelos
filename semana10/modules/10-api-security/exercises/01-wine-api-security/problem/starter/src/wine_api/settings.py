@@ -1,18 +1,8 @@
-"""Configuración y secretos del servicio, leídos del entorno o de `.env`.
-
-Todas las variables llevan el prefijo `WINE_API_`. Como ejemplo ya está migrada
-`WINE_API_MODE`, que en S9 se leía con `os.environ`. Los tipos complejos
-(`WINE_API_CLIENTS`, `WINE_API_CORS_ORIGINS`) se escribirán en JSON.
-"""
+"""Configuración validada en arranque (pydantic-settings y SecretStr)."""
 
 from typing import Literal
 
-from pydantic import (  # noqa: F401 - pistas para S10.1
-    BaseModel,
-    Field,
-    SecretStr,
-    field_validator,
-)
+from pydantic import BaseModel, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Scope = Literal["predict", "admin"]
@@ -29,6 +19,11 @@ class ClientConfig(BaseModel):
     # - `rate_limit_per_minute`: entero estrictamente positivo, 60 por defecto
     #   (`Field` con una restricción numérica).
     # Comprobación: tests/test_s10_1_settings.py (repr y configuración inválida).
+    key: SecretStr = Field(description="API key del cliente; oculta en `repr`.")
+    scopes: list[Scope] = Field(description="Operaciones que la clave autoriza.")
+    rate_limit_per_minute: int = Field(
+        default=60, gt=0, description="Peticiones de predicción por minuto."
+    )
 
 
 class Settings(BaseSettings):
@@ -52,3 +47,13 @@ class Settings(BaseSettings):
     # ¿Por qué un error de configuración debe impedir arrancar en lugar de
     # aparecer en la primera petición?
     # Comprobación: uv run pytest -q tests/test_s10_1_settings.py
+    clients: dict[str, ClientConfig] = {}
+    cors_origins: list[str] = ["http://localhost:8501"]
+    docs_enabled: bool = True
+
+    @field_validator("cors_origins")
+    @classmethod
+    def _reject_wildcard(cls, origins: list[str]) -> list[str]:
+        if "*" in origins:
+            raise ValueError("list the allowed origins explicitly; '*' is not allowed")
+        return origins

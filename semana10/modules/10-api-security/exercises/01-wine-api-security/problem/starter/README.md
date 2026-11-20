@@ -114,3 +114,15 @@ LOCUST_API_KEY=<clave-front> uv run --group load locust -f locustfile.py \
 - `CORSMiddleware`: FastAPI, «CORS (Cross-Origin Resource Sharing)».
 - Locust: «Writing a locustfile», `catch_response` y «Retrieve test statistics
   in CSV format».
+
+---
+
+## Nota de versión 2.0.0 y cambios en el cliente
+
+- **Por qué pasa a versión 2.0.0**:
+  La API ahora exige obligatoriamente la cabecera `X-API-Key` para poder hacer predicciones. Esto es un cambio que rompe la compatibilidad. Cualquier cliente anterior (de la versión 1.x) que llame de forma anónima recibirá un error `401 Unauthorized` en lugar de una predicción.
+- **Qué tiene que cambiar el frontend de Streamlit (Semana 7)**:
+  En el cliente HTTP de la interfaz web, hay que añadir en los headers de cada petición POST la cabecera `X-API-Key: <clave>`. Además, debe contemplar los nuevos códigos de error: `401` (clave ausente o incorrecta), `403` (sin permisos de scope) y `429` (límite alcanzado, leyendo la cabecera `Retry-After` para avisar al usuario del tiempo de espera).
+- **Dónde guardar la clave en el frontend**:
+  Nunca hardcodeada en el código fuente. Se debe leer de variables de entorno o mediante el archivo de secretos de Streamlit (`.streamlit/secrets.toml`), asegurándonos de que esté incluido en `.gitignore`.
+

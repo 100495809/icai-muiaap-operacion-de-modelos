@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,/v1/predictions,"ConnectionRefusedError(10061, '[WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.')",18,2026-11-20T19:31:32Z,2026-11-20T19:31:35Z
+POST,/v1/predictions,HTTPError('429 Client Error: Too Many Requests for url: /v1/predictions'),634,2026-11-20T19:31:40Z,2026-11-20T19:32:28Z
+POST,/v1/predictions [422],"CatchResponseError('expected 422, got 0')",3,2026-11-20T19:31:33Z,2026-11-20T19:31:35Z
+POST,/v1/predictions [422],"CatchResponseError('expected 422, got 429')",75,2026-11-20T19:31:40Z,2026-11-20T19:32:28Z
